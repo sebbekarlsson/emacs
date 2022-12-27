@@ -79,5 +79,12 @@
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 
+(global-display-line-numbers-mode)
+
 (set-face-foreground 'vertical-border
   (face-background 'vertical-border nil t))
+
+
+(global-set-key [?\C-\+] 'text-scale-increase)
+(global-set-key [?\C-\=] 'text-scale-increase)
+(global-set-key [?\C-\-] 'text-scale-decrease)
