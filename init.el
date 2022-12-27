@@ -12,7 +12,7 @@
  '(custom-safe-themes
    '("72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "d80952c58cf1b06d936b1392c38230b74ae1a2a6729594770762dc0779ac66b7" default))
  '(package-selected-packages
-   '(gruvbox-theme lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
+   '(fontawesome lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -21,6 +21,8 @@
  )
 
 (load-theme 'gruvbox-dark-medium t)
+
+(set-frame-font "DejaVu Sans Mono 12" nil t)
 
 (require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
