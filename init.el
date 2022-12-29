@@ -4,6 +4,11 @@
 ;; and `package-pinned-packages`. Most users will not need or want to do this.
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
+
+
+(add-to-list 'load-path "~/.emacs.d/custom")
+(require 'glms-mode)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -12,7 +17,7 @@
  '(custom-safe-themes
    '("72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "d80952c58cf1b06d936b1392c38230b74ae1a2a6729594770762dc0779ac66b7" default))
  '(package-selected-packages
-   '(fontawesome lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
+   '(company-glsl lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -38,6 +43,7 @@
 (evil-define-key 'normal neotree-mode-map (kbd "p") 'neotree-previous-line)
 (evil-define-key 'normal neotree-mode-map (kbd "A") 'neotree-stretch-toggle)
 (evil-define-key 'normal neotree-mode-map (kbd "H") 'neotree-hidden-file-toggle)
+(evil-define-key 'normal neotree-mode-map (kbd "c") 'neotree-create-node)
 
 (global-set-key (kbd "<M-left>") 'windmove-left)
 (global-set-key (kbd "<M-right>") 'windmove-right)
@@ -60,9 +66,12 @@
 (define-key global-map [remap execute-extended-command] #'helm-M-x)
 (define-key global-map [remap switch-to-buffer] #'helm-mini)
 
+(setq lsp-warn-no-matched-clients nil)
+
 (which-key-mode)
 (add-hook 'c-mode-hook 'lsp)
 (add-hook 'c++-mode-hook 'lsp)
+
 
 (setq gc-cons-threshold (* 100 1024 1024)
             read-process-output-max (* 1024 1024)
@@ -80,6 +89,11 @@
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
+(setq use-short-answers t)
+(setq confirm-nonexistent-file-or-buffer nil)
+
+(setq inhibit-startup-message t
+            inhibit-startup-echo-area-message t)
 
 (global-display-line-numbers-mode)
 
@@ -90,3 +104,10 @@
 (global-set-key [?\C-\+] 'text-scale-increase)
 (global-set-key [?\C-\=] 'text-scale-increase)
 (global-set-key [?\C-\-] 'text-scale-decrease)
+
+
+(defun reload-init-file ()
+    (interactive)
+      (load-file user-init-file))
+
+(global-set-key (kbd "C-c C-l") 'reload-init-file)    ; Reload .emacs file
