@@ -20,6 +20,8 @@
 (global-set-key (kbd "<M-up>") 'windmove-up)
 (global-set-key (kbd "<M-down>") 'windmove-down)
 
+(global-set-key (kbd "<M-l>") 'neotree-toggle)
+(global-set-key [f8] 'neotree-toggle)
 
 (defun reload-init-file ()
   (interactive)

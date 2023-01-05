@@ -1,9 +1,9 @@
 (setq glms-font-lock-keywords
       (let* (
             ;; define several category of keywords
-            (x-keywords '("typedef" "break" "while" "for" "return" "for" "if" "else" "switch"))
-            (x-types '("bool" "enum" "struct" "function" "number" "object" "string" "array" "image" "vec2" "vec3" "vec4"))
-            (x-constants '("PI" "TAU" "true" "false"))
+            (x-keywords '("typedef" "break" "while" "for" "return" "for" "if" "else" "switch" "import" "as"))
+            (x-types '("bool" "enum" "struct" "function" "number" "object" "string" "array" "image" "vec2" "vec3" "vec4" "iterator" "int" "float"))
+            (x-constants '("PI" "TAU" "true" "false" "null"))
             (x-functions 
               '(
                 "print"
@@ -12,15 +12,31 @@
                 "tan"
                 "atan"
                 "fract"
+                "smoothstep"
+                "mat4"
+                "mat3"
+                "file"
                 "cross"
                 "dot"
                 "lerp"
+                "mix"
+                "log"
+                "log10"
+                "pow"
+                "sqrt"
+                "normalize"
+                "unit"
                 "clamp"
                 "max"
                 "min"
                 "abs"
                 "distance"
                 "length"
+                "perspective"
+                "ortho"
+                "quatFor"
+                "cantor"
+                "decant"
                 ))
 
             ;; generate regex string for each category of keywords

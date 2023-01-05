@@ -5,6 +5,7 @@
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
+(setq warning-minimum-level :emergency)
 
 (add-to-list 'load-path "~/.emacs.d/custom")
 (require 'glms-mode)
@@ -18,7 +19,7 @@
  '(custom-safe-themes
    '("72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "d80952c58cf1b06d936b1392c38230b74ae1a2a6729594770762dc0779ac66b7" default))
  '(package-selected-packages
-   '(evil-multiedit lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
+   '(cmake-mode lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -31,7 +32,7 @@
 (set-frame-font "DejaVu Sans Mono 12" nil t)
 
 (require 'neotree)
-(global-set-key [f8] 'neotree-toggle)
+
 
 (require 'evil)
 (evil-mode 1)
@@ -57,7 +58,7 @@
 (define-key global-map [remap execute-extended-command] #'helm-M-x)
 (define-key global-map [remap switch-to-buffer] #'helm-mini)
 
-(setq lsp-warn-no-matched-clients nil)
+;(setq lsp-warn-no-matched-clients nil)
 
 (which-key-mode)
 (add-hook 'c-mode-hook 'lsp)
