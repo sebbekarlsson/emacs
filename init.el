@@ -92,4 +92,10 @@
 (set-face-foreground 'vertical-border
   (face-background 'vertical-border nil t))
 
+
+(defun include-paths ()
+   (setq flycheck-clang-include-path (list (expand-file-name "./_deps/*/include"))))
+
+(add-hook 'c++-mode-hook 'include-paths)
+
 (load "key-bind")
