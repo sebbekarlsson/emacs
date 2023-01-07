@@ -23,6 +23,10 @@
 (global-set-key (kbd "<M-l>") 'neotree-toggle)
 (global-set-key [f8] 'neotree-toggle)
 
+(global-set-key [?\C-\=] 'text-scale-increase)
+(global-set-key [?\C-\+] 'text-scale-increase)
+(global-set-key [?\C-\-] 'text-scale-decrease)
+
 (defun reload-init-file ()
   (interactive)
   (load-file user-init-file))
