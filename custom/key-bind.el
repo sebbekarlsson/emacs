@@ -27,9 +27,14 @@
 (global-set-key [?\C-\+] 'text-scale-increase)
 (global-set-key [?\C-\-] 'text-scale-decrease)
 
+
+(global-set-key (kbd "M-s") 'find-file-in-project)
+
 (defun reload-init-file ()
   (interactive)
-  (load-file user-init-file))
+  (save-excursion
+  (load-file user-init-file)
+    (message "Reloaded init file.")))
 
 (global-set-key (kbd "C-c C-l") 'reload-init-file)    ; Reload .emacs file
 
