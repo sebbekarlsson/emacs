@@ -99,7 +99,7 @@
  '(custom-safe-themes
    '("72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "d80952c58cf1b06d936b1392c38230b74ae1a2a6729594770762dc0779ac66b7" default))
  '(package-selected-packages
-   '(find-file-in-project lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
+   '(company-rtags lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -184,5 +184,8 @@
 (setq neo-confirm-delete-file 'off-p)
 (setq neo-confirm-delete-directory-recursively 'off-p)
 (setq neo-confirm-create-directory 'off-p)
+
+(require 'rtags)
+(cmake-ide-setup)
 
 (load "key-bind")
