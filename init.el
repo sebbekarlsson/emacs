@@ -7,6 +7,20 @@
 
 (setq warning-minimum-level :error)
 
+(setq-default indent-tabs-mode nil)
+
+(defvar user-temporary-file-directory
+    (concat temporary-file-directory user-login-name "/"))
+(make-directory user-temporary-file-directory t)
+(setq backup-by-copying t)
+(setq backup-directory-alist
+            `(("." . ,user-temporary-file-directory)
+                      (,tramp-file-name-regexp nil)))
+(setq auto-save-list-file-prefix
+            (concat user-temporary-file-directory ".auto-saves-"))
+(setq auto-save-file-name-transforms
+            `((".*" ,user-temporary-file-directory t)))
+
 (add-to-list 'load-path "~/.emacs.d/custom")
 (require 'glms-mode)
 
@@ -250,5 +264,7 @@
   :hook ((typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
          (before-save . tide-format-before-save)))
+
+(require 'shader-mode)
 
 (load "key-bind")
