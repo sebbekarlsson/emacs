@@ -2,13 +2,43 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
 ;; and `package-pinned-packages`. Most users will not need or want to do this.
-;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
-
-(setq warning-minimum-level :error)
+(package-refresh-contents)
 
 (add-to-list 'load-path "~/.emacs.d/custom")
+
+;; Download Evil
+(unless (package-installed-p 'evil)
+    (package-install 'evil))
+
+(unless (package-installed-p 'evil-mc)
+        (package-install 'evil-mc))
+
+(unless (package-installed-p 'evil-multiedit)
+          (package-install 'evil-multiedit))
+
+(unless (package-installed-p 'find-file-in-project)
+            (package-install 'find-file-in-project))
+
+;; Enable Evil
+(require 'evil)
+(evil-mode 1)
+
+(require 'evil-mc)
+(global-evil-mc-mode  1)
+
+(require 'neotree)
+
+
+(require 'evil-multiedit)
+(evil-multiedit-default-keybinds)
+
+(require 'find-file-in-project)
+
 (require 'glms-mode)
+
+(setq warning-minimum-level :error)
 
 
 (custom-set-variables
@@ -110,20 +140,6 @@
 (load-theme 'gruvbox-dark-medium t)
 
 (set-frame-font "DejaVu Sans Mono 12" nil t)
-
-(require 'neotree)
-
-
-(require 'evil)
-(evil-mode 1)
-
-(require 'evil-mc)
-(global-evil-mc-mode  1)
-
-(require 'evil-multiedit)
-(evil-multiedit-default-keybinds)
-
-(require 'find-file-in-project)
 
 (setq package-selected-packages '(lsp-mode yasnippet lsp-treemacs helm-lsp
                                                projectile hydra flycheck company avy which-key helm-xref dap-mode))
