@@ -5,21 +5,6 @@
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
-(setq warning-minimum-level :error)
-
-(setq-default indent-tabs-mode nil)
-
-(defvar user-temporary-file-directory
-    (concat temporary-file-directory user-login-name "/"))
-(make-directory user-temporary-file-directory t)
-(setq backup-by-copying t)
-(setq backup-directory-alist
-            `(("." . ,user-temporary-file-directory)
-                      (,tramp-file-name-regexp nil)))
-(setq auto-save-list-file-prefix
-            (concat user-temporary-file-directory ".auto-saves-"))
-(setq auto-save-file-name-transforms
-            `((".*" ,user-temporary-file-directory t)))
 
 (add-to-list 'load-path "~/.emacs.d/custom")
 (require 'glms-mode)
@@ -113,7 +98,7 @@
  '(custom-safe-themes
    '("72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "d80952c58cf1b06d936b1392c38230b74ae1a2a6729594770762dc0779ac66b7" default))
  '(package-selected-packages
-   '(tide typescript-mode web-mode company-quickhelp cmake-mode lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
+   '(json-mode typescript-mode web-mode company-quickhelp cmake-mode yasnippet helm-lsp hydra flycheck company which-key helm-xref)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -140,11 +125,11 @@
 (require 'find-file-in-project)
 
 (setq package-selected-packages '(lsp-mode yasnippet lsp-treemacs helm-lsp
-                                               projectile hydra flycheck company avy which-key helm-xref dap-mode))
+                                           projectile hydra flycheck company avy which-key helm-xref dap-mode))
 
 (when (cl-find-if-not #'package-installed-p package-selected-packages)
-    (package-refresh-contents)
-      (mapc #'package-install package-selected-packages))
+  (package-refresh-contents)
+  (mapc #'package-install package-selected-packages))
 
 ;; sample `helm' configuration use https://github.com/emacs-helm/helm/ for details
 (helm-mode)
@@ -153,7 +138,7 @@
 (define-key global-map [remap execute-extended-command] #'helm-M-x)
 (define-key global-map [remap switch-to-buffer] #'helm-mini)
 
-;(setq lsp-warn-no-matched-clients nil)
+                                        ;(setq lsp-warn-no-matched-clients nil)
 
 (which-key-mode)
 (add-hook 'c-mode-hook 'lsp)
@@ -161,43 +146,41 @@
 
 
 (setq gc-cons-threshold (* 100 1024 1024)
-            read-process-output-max (* 1024 1024)
-                  treemacs-space-between-root-nodes nil
-                        company-idle-delay 0.0
-                              company-minimum-prefix-length 1
-                                    lsp-idle-delay 0.1)  ;; clangd is fast
+      read-process-output-max (* 1024 1024)
+      treemacs-space-between-root-nodes nil
+      company-idle-delay 0.0
+      company-minimum-prefix-length 1
+      lsp-idle-delay 0.1)  ;; clangd is fast
 
 (with-eval-after-load 'lsp-mode
-                        (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
-                          (require 'dap-cpptools)
-                            (yas-global-mode))
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+  (require 'dap-cpptools)
+  (yas-global-mode))
 
 
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
-(setq use-short-answers t)
-(setq confirm-nonexistent-file-or-buffer nil)
 
-(setq inhibit-startup-message t
-            inhibit-startup-echo-area-message t)
 
 (global-display-line-numbers-mode)
 
 (set-face-foreground 'vertical-border
-  (face-background 'vertical-border nil t))
+                     (face-background 'vertical-border nil t))
 
 
 (defun include-paths ()
-   (setq flycheck-clang-include-path (list (expand-file-name "./_deps/*/include"))))
+  (setq flycheck-clang-include-path (list 
+                                     
+                                     (expand-file-name "./_deps/*/include")
+                                     (expand-file-name "./build/_deps/*/include")
+                                     
+
+                                     )))
 
 (add-hook 'c++-mode-hook 'include-paths)
 
 
-(setq neo-confirm-create-file 'off-p)
-(setq neo-confirm-delete-file 'off-p)
-(setq neo-confirm-delete-directory-recursively 'off-p)
-(setq neo-confirm-create-directory 'off-p)
 
 (use-package flycheck
   :ensure t
@@ -228,43 +211,15 @@
   (use-package pos-tip
     :ensure t))
 
-(use-package web-mode
-  :ensure t
-  :mode (("\\.html?\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode))
-  :config
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-        web-mode-block-padding 2
-        web-mode-comment-style 2
-
-        web-mode-enable-css-colorization t
-        web-mode-enable-auto-pairing t
-        web-mode-enable-comment-keywords t
-        web-mode-enable-current-element-highlight t
-        )
-  (add-hook 'web-mode-hook
-            (lambda ()
-              (when (string-equal "tsx" (file-name-extension buffer-file-name))
-		(setup-tide-mode))))
-  (flycheck-add-mode 'typescript-tslint 'web-mode))
-
-(use-package typescript-mode
-  :ensure t
-  :config
-  (setq typescript-indent-level 2)
-  (add-hook 'typescript-mode #'subword-mode))
-
-(use-package tide
-  :init
-  :ensure t
-  :after (typescript-mode company flycheck)
-  :hook ((typescript-mode . tide-setup)
-         (typescript-mode . tide-hl-identifier-mode)
-         (before-save . tide-format-before-save)))
-
 (require 'shader-mode)
 
+;; uniquify changes conflicting buffer names from file<2> etc
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'reverse)
+(setq uniquify-separator "/")
+(setq uniquify-after-kill-buffer-p t) ; rename after killing uniquified
+(setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
+
+(load "web")
+(load "opts")
 (load "key-bind")
