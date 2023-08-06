@@ -144,6 +144,8 @@
 (add-hook 'c-mode-hook 'lsp)
 (add-hook 'c++-mode-hook 'lsp)
 
+(setq lsp-enable-on-type-formatting nil)
+
 
 (setq gc-cons-threshold (* 100 1024 1024)
       read-process-output-max (* 1024 1024)
@@ -155,7 +157,8 @@
 (with-eval-after-load 'lsp-mode
   (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
   (require 'dap-cpptools)
-  (yas-global-mode))
+  (yas-global-mode)
+  (setq lsp-enable-on-type-formatting nil))
 
 
 (menu-bar-mode -1)

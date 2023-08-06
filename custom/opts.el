@@ -8,6 +8,18 @@
              (setq tab-width 2)))
 
 
+(add-hook 'lsp-mode-hook
+          (lambda ()
+            (setq tab-width 2)))
+
+(add-hook 'c-mode-hook
+          (lambda ()
+            (setq tab-width 2)))
+
+(add-hook 'c++-mode-hook
+          (lambda ()
+            (setq tab-width 2)))
+
 (add-hook 'json-mode-hook
           (lambda ()
             (make-local-variable 'js-indent-level)
@@ -21,6 +33,8 @@
             (setq tab-width 2)
             (setq js-indent-level 2)))
 
+
+(setq lsp-enable-on-type-formatting nil)
 
 
 (defvar user-temporary-file-directory
