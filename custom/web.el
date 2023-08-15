@@ -2,7 +2,8 @@
   :ensure t
   :mode (("\\.html?\\'" . web-mode)
          ("\\.tsx\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode))
+         ("\\.jsx\\'" . web-mode)
+         ("\\.vue\\'" . web-mode))
   :config
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
@@ -15,10 +16,34 @@
         web-mode-enable-comment-keywords t
         web-mode-enable-current-element-highlight t
         )
+
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+
+
+(defun setup-vue-mode ()
+  (interactive)
+  (flycheck-mode +1)
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (vue-mode +1)
+  (lsp-mode +1)
+  (company-mode +1)
+  'lsp)
+
   (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                (setup-tide-mode))))
+                (setup-tide-mode)))
+            (lambda ()
+              (when (string-equal "vue" (file-name-extension buffer-file-name))
+                (setup-vue-mode))))
   (flycheck-add-mode 'typescript-tslint 'web-mode))
 
 (use-package typescript-mode

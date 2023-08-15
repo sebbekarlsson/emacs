@@ -1,13 +1,20 @@
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+(add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
+;(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
 ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
 ;; and `package-pinned-packages`. Most users will not need or want to do this.
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
+;(require 'mmm-auto)
 
 (add-to-list 'load-path "~/.emacs.d/custom")
 (require 'glms-mode)
+
+;(setq mmm-global-mode 'maybe)
+;(mmm-add-mode-ext-class 'kotlin-mode "\\.kt\\'" 'tree-sitter-mode)
 
 
 (custom-set-variables
@@ -98,7 +105,7 @@
  '(custom-safe-themes
    '("72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "d80952c58cf1b06d936b1392c38230b74ae1a2a6729594770762dc0779ac66b7" default))
  '(package-selected-packages
-   '(json-mode typescript-mode web-mode company-quickhelp cmake-mode yasnippet helm-lsp hydra flycheck company which-key helm-xref)))
+   '(vue-mode lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -140,9 +147,18 @@
 
                                         ;(setq lsp-warn-no-matched-clients nil)
 
+
+
 (which-key-mode)
 (add-hook 'c-mode-hook 'lsp)
 (add-hook 'c++-mode-hook 'lsp)
+(add-hook 'kotlin-mode-hook 'lsp)
+(add-hook 'kotlin-ts-mode-hook 'lsp)
+(add-hook 'vue-mode 'lsp)
+(add-hook 'web-mode-hook 'lsp)
+;(add-hook 'mmm-mode 'lsp)
+
+
 
 (setq lsp-enable-on-type-formatting nil)
 
@@ -184,20 +200,12 @@
 (add-hook 'c++-mode-hook 'include-paths)
 
 
-
 (use-package flycheck
   :ensure t
   :config
-  (add-hook 'typescript-mode-hook 'flycheck-mode))
-
-(defun setup-tide-mode ()
-  (interactive)
-  (tide-setup)
-  (flycheck-mode +1)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (eldoc-mode +1)
-  (tide-hl-identifier-mode +1)
-  (company-mode +1))
+  (add-hook 'typescript-mode-hook 'flycheck-mode)
+  (add-hook 'kotlin-mode-hook 'flycheck-mode)
+  (add-hook 'kotlin-ts-mode-hook 'flycheck-mode))
 
 (use-package company
   :ensure t
@@ -223,6 +231,28 @@
 (setq uniquify-after-kill-buffer-p t) ; rename after killing uniquified
 (setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
 
+(require 'web-mode)
+(require 'vue-mode)
+(require 'lsp-mode)
+
 (load "web")
 (load "opts")
 (load "key-bind")
+
+
+
+(setq vue-mode-packages
+  '(vue-mode lsp-mode web-mode))
+
+(setq vue-mode-excluded-packages '())
+
+
+(defun vue-mode/init-vue-mode ()
+  (use-package vue-mode
+               :config
+               ;; 0, 1, or 2, representing (respectively) none, low, and high coloring
+               (setq mmm-submode-decoration-level 0)))
+
+(add-hook 'mmm-mode-hook
+          (lambda ()
+            (set-face-background 'mmm-default-submode-face nil)))
