@@ -2,8 +2,9 @@
   :ensure t
   :mode (("\\.html?\\'" . web-mode)
          ("\\.tsx\\'" . web-mode)
+         ("\\.ts\\'" . web-mode)
          ("\\.jsx\\'" . web-mode)
-         ("\\.vue\\'" . web-mode))
+         )
   :config
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
@@ -27,23 +28,21 @@
   (company-mode +1))
 
 
-(defun setup-vue-mode ()
-  (interactive)
-  (flycheck-mode +1)
-  (eldoc-mode +1)
-  (tide-hl-identifier-mode +1)
-  (vue-mode +1)
-  (lsp-mode +1)
-  (company-mode +1)
-  'lsp)
-
+;(defun setup-vue-mode ()
+;  (interactive)
+;  (flycheck-mode +1)
+;  (eldoc-mode +1)
+;  (tide-hl-identifier-mode +1)
+;  (vue-mode +1)
+;  (lsp-mode +1)
+;  (company-mode +1)
+;  'lsp)
+;
   (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "tsx" (file-name-extension buffer-file-name))
                 (setup-tide-mode)))
-            (lambda ()
-              (when (string-equal "vue" (file-name-extension buffer-file-name))
-                (setup-vue-mode))))
+            )
   (flycheck-add-mode 'typescript-tslint 'web-mode))
 
 (use-package typescript-mode

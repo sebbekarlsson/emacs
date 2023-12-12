@@ -30,3 +30,8 @@ tags
 # End of https://www.toptal.com/developers/gitignore/api/vim
 .dap-*
 eln-cache/
+tramp
+*.cache
+projectile-bookmarks.eld
+transient/
+url/
