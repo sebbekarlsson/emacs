@@ -135,8 +135,9 @@
      default))
  '(lsp-enable-on-type-formatting nil)
  '(package-selected-packages
-   '(avy company dap-mode flycheck helm-lsp helm-xref hydra lsp-mode
-         lsp-treemacs projectile uncrustify-mode which-key yasnippet)))
+   '(avy company css-mode ctags-update dap-mode flycheck helm-lsp
+         helm-xref hydra lsp-mode lsp-treemacs lsp-ui nil projectile
+         uncrustify-mode which-key yasnippet)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -215,16 +216,16 @@
                      (face-background 'vertical-border nil t))
 
 
-(defun include-paths ()
-  (setq flycheck-clang-include-path (list 
-                                     
-                                     (expand-file-name "./_deps/*/include")
-                                     (expand-file-name "./build/_deps/*/include")
-                                     
-
-                                     )))
-
-(add-hook 'c++-mode-hook 'include-paths)
+;(defun include-paths ()
+;  (setq flycheck-clang-include-path (list 
+;                                     
+;                                     (expand-file-name "./_deps/*/include")
+;                                     (expand-file-name "./build/_deps/*/include")
+;                                     
+;
+;                                     )))
+;
+;(add-hook 'c++-mode-hook 'include-paths)
 
 
 (use-package flycheck
@@ -369,7 +370,7 @@
   :bind (:map evil-normal-state-map
               ("gh" . lsp-describe-thing-at-point)
               ("gr" . lsp-find-references)
-              ("gD" . xref-find-apropos)
+              ("gD" . lsp-find-implementation)
               ("gd" . lsp-find-definition)
               ;:map md/leader-map
               ("Ni" . imenu)
@@ -387,76 +388,21 @@
             (set 'c-electric-flag t)))
 
 
-(setq electric-indent-chars (remq ?\{ electric-indent-chars))
+;(setq electric-indent-chars (remq ?\{ electric-indent-chars))
 
-(add-hook 'c-mode-hook
-          (lambda ()
-            (setq-local electric-indent-chars (remq ?\{ electric-indent-chars))))
-
-
+;(add-hook 'c-mode-hook
+;          (lambda ()
+;            (setq-local electric-indent-chars (remq ?\{ electric-indent-chars))))
 
 
 
-(defconst my-c-style
-    '((c-recognize-knr-p          . nil)
-      (c-tab-always-indent        . t)
-      (c-basic-offset             . 2)
-      (c-comment-only-line-offset . 0)
-      (c-hanging-braces-alist     . ((block-close . c-snug-do-while)
-                                     (brace-entry-open)
-                                     (brace-list-close)
-                                     (brace-list-open after)
-                                     (brace-list-intro)
-                                     (class-open after)
-                                     (class-close before)
-                                     (extern-lang-open after)
-                                     (inexpr-class-open after)
-                                     (inexpr-class-close before)
-                                     (inline-open after)
-                                     (inline-close before)
-                                     (statement-cont)
-                                     (substatement-open after)))
-      (c-hanging-colons-alist     . ((member-init-intro before)
-                                     (inher-intro)
-                                     (case-label after)
-                                     (label after)
-                                     (access-label after)))
-      (c-cleanup-list             . (scope-operator
-                                     empty-defun-braces
-                                     defun-close-semi))
-      (c-offsets-alist            . ((access-label . -)
-                                     (brace-list-close . 0)
-                                     (brace-list-entry . 0)
-                                     (brace-list-intro . +)
-                                     (class-close . 0)
-                                     (class-open . 0)
-                                     (defun-block-intro 'tab-width)
-                                     (statement-block-intro . 'tab-width)
-                                     (defun-close . 0)
-                                     (defun-open . 0)
-                                     (inclass . +)
-                                     (label . 0)
-                                     (statement . 0)
-                                     (statement-cont . *)
-                                     (topmost-intro-cont . 0)
-                                     (arglist-close . c-lineup-arglist)
-                                     (block-open . 0)
-                                     (case-label . +)
-                                     (func-decl-cont . c-lineup-java-throws)
-                                     (inexpr-class . 0)
-                                     (inher-cont . c-lineup-java-inher)
-                                     (inline-open . 0)
-                                     (substatement-open . 0)
-                                     (innamespace . 0)
-                                     ))
-      (c-echo-syntactic-information-p . t))
-    "My C Programming Style")
-;; Offset customizations not in my-c-style
-(setq c-offsets-alist '((member-init-intro . ++)))
+
+
+(require 'c99-style)
 ;; Customizations for all modes in CC Mode.
 (defun my-c-mode-common-hook ()
   ;; add my personal style and set it for the current buffer
-  (c-add-style "PERSONAL" my-c-style t)
+  (c-add-style "PERSONAL" c99-style)
   ;; other customizations
   (setq tab-width 2)
   ;; keybindings for all supported languages.  We can put these in
