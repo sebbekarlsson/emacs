@@ -64,7 +64,8 @@
     ;; using a Hi-DPI display, uncomment this to double the icon size.
     ;;(treemacs-resize-icons 44)
 
-    (treemacs-follow-mode t)
+    (treemacs-follow-mode -1)
+    (treemacs-tag-follow-mode -1)
     (treemacs-filewatch-mode t)
     (treemacs-fringe-indicator-mode 'always)
     (when treemacs-python-executable
@@ -113,6 +114,7 @@
   :after (treemacs)
   :ensure t
   :config (treemacs-set-scope-type 'Tabs))
+
 
 
 (add-hook 'projectile-after-switch-project-hook 'treemacs-add-and-display-current-project-exclusively)

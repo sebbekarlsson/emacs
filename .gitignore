@@ -35,3 +35,12 @@ tramp
 projectile-bookmarks.eld
 transient/
 url/
+/bookmarks
+/.local
+/persp-confs/
+/places
+/history
+/projects
+/recentf
+/desktop
+/.emacs.desktop

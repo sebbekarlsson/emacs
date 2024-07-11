@@ -1,321 +1,230 @@
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
-(add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
-;(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
-;; and `package-pinned-packages`. Most users will not need or want to do this.
-;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-(package-initialize)
+;;; init.el --- Emacs configuration -*- lexical-binding: t -*-
 
-;(require 'mmm-auto)
+;;; Commentary:
 
-(add-to-list 'load-path "~/.emacs.d/custom")
+;; Save the contents of this file to ~/.config/emacs/init.el and
+;; you're ready to boot up Emacs.
 
-;(setq mmm-global-mode 'maybe)
-;(mmm-add-mode-ext-class 'kotlin-mode "\\.kt\\'" 'tree-sitter-mode)
+;; Hack this file! One of the best ways to get started with Emacs is
+;; to look at other peoples' configurations and extract the pieces
+;; that work for you. That's where this configuration started. I
+;; encourage you to read through the code in this file and explore the
+;; functions and variables using the built-in help system (details
+;; below). Happy hacking!
 
+;; "C-<chr>  means hold the CONTROL key while typing the character <chr>.
+;; Thus, C-f would be: hold the CONTROL key and type f." (Emacs tutorial)
+;;
+;; - C-h t: Start the Emacs tutorial
+;; - C-h o some-symbol: Describe symbol
+;; - C-h C-q: Pull up the quick-help cheatsheet
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(connection-local-criteria-alist
-   '(((:application eshell) eshell-connection-default-profile)
-     ((:application tramp :protocol "kubernetes")
-      tramp-kubernetes-connection-local-default-profile)
-     ((:application tramp :protocol "flatpak")
-      tramp-container-connection-local-default-flatpak-profile
-      tramp-flatpak-connection-local-default-profile)
-     ((:application tramp)
-      tramp-connection-local-default-system-profile
-      tramp-connection-local-default-shell-profile)))
- '(connection-local-profile-alist
-   '((eshell-connection-default-profile (eshell-path-env-list))
-     (tramp-flatpak-connection-local-default-profile
-      (tramp-remote-path "/app/bin" tramp-default-remote-path "/bin"
-                         "/usr/bin" "/sbin" "/usr/sbin"
-                         "/usr/local/bin" "/usr/local/sbin"
-                         "/local/bin" "/local/freeware/bin"
-                         "/local/gnu/bin" "/usr/freeware/bin"
-                         "/usr/pkg/bin" "/usr/contrib/bin" "/opt/bin"
-                         "/opt/sbin" "/opt/local/bin"))
-     (tramp-kubernetes-connection-local-default-profile
-      (tramp-config-check . tramp-kubernetes--current-context-data)
-      (tramp-extra-expand-args 97
-                               (tramp-kubernetes--container
-                                (car tramp-current-connection))
-                               104
-                               (tramp-kubernetes--pod
-                                (car tramp-current-connection))
-                               120
-                               (tramp-kubernetes--context-namespace
-                                (car tramp-current-connection))))
-     (tramp-container-connection-local-default-flatpak-profile
-      (tramp-remote-path "/app/bin" tramp-default-remote-path "/bin"
-                         "/usr/bin" "/sbin" "/usr/sbin"
-                         "/usr/local/bin" "/usr/local/sbin"
-                         "/local/bin" "/local/freeware/bin"
-                         "/local/gnu/bin" "/usr/freeware/bin"
-                         "/usr/pkg/bin" "/usr/contrib/bin" "/opt/bin"
-                         "/opt/sbin" "/opt/local/bin"))
-     (tramp-connection-local-darwin-ps-profile
-      (tramp-process-attributes-ps-args "-acxww" "-o"
-                                        "pid,uid,user,gid,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                        "-o" "state=abcde" "-o"
-                                        "ppid,pgid,sess,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etime,pcpu,pmem,args")
-      (tramp-process-attributes-ps-format (pid . number)
-                                          (euid . number)
-                                          (user . string)
-                                          (egid . number) (comm . 52)
-                                          (state . 5) (ppid . number)
-                                          (pgrp . number)
-                                          (sess . number)
-                                          (ttname . string)
-                                          (tpgid . number)
-                                          (minflt . number)
-                                          (majflt . number)
-                                          (time . tramp-ps-time)
-                                          (pri . number)
-                                          (nice . number)
-                                          (vsize . number)
-                                          (rss . number)
-                                          (etime . tramp-ps-time)
-                                          (pcpu . number)
-                                          (pmem . number) (args)))
-     (tramp-connection-local-busybox-ps-profile
-      (tramp-process-attributes-ps-args "-o"
-                                        "pid,user,group,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                        "-o" "stat=abcde" "-o"
-                                        "ppid,pgid,tty,time,nice,etime,args")
-      (tramp-process-attributes-ps-format (pid . number)
-                                          (user . string)
-                                          (group . string) (comm . 52)
-                                          (state . 5) (ppid . number)
-                                          (pgrp . number)
-                                          (ttname . string)
-                                          (time . tramp-ps-time)
-                                          (nice . number)
-                                          (etime . tramp-ps-time)
-                                          (args)))
-     (tramp-connection-local-bsd-ps-profile
-      (tramp-process-attributes-ps-args "-acxww" "-o"
-                                        "pid,euid,user,egid,egroup,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                        "-o"
-                                        "state,ppid,pgid,sid,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etimes,pcpu,pmem,args")
-      (tramp-process-attributes-ps-format (pid . number)
-                                          (euid . number)
-                                          (user . string)
-                                          (egid . number)
-                                          (group . string) (comm . 52)
-                                          (state . string)
-                                          (ppid . number)
-                                          (pgrp . number)
-                                          (sess . number)
-                                          (ttname . string)
-                                          (tpgid . number)
-                                          (minflt . number)
-                                          (majflt . number)
-                                          (time . tramp-ps-time)
-                                          (pri . number)
-                                          (nice . number)
-                                          (vsize . number)
-                                          (rss . number)
-                                          (etime . number)
-                                          (pcpu . number)
-                                          (pmem . number) (args)))
-     (tramp-connection-local-default-shell-profile
-      (shell-file-name . "/bin/sh") (shell-command-switch . "-c"))
-     (tramp-connection-local-default-system-profile
-      (path-separator . ":") (null-device . "/dev/null"))))
- '(custom-safe-themes
-   '("72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe"
-     "d80952c58cf1b06d936b1392c38230b74ae1a2a6729594770762dc0779ac66b7"
-     default))
- '(lsp-enable-on-type-formatting nil)
- '(package-selected-packages
-   '(avy company css-mode ctags-update dap-mode flycheck helm-lsp
-         helm-xref hydra lsp-mode lsp-treemacs lsp-ui nil projectile
-         uncrustify-mode which-key yasnippet)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;;; Code:
 
-(load-theme 'gruvbox-dark-medium t)
+;; Performance tweaks for modern machines
+;(setq gc-cons-threshold 100000000) ; 100 mb
+;(setq read-process-output-max (* 1024 1024)) ; 1mb
 
-(set-frame-font "DejaVu Sans Mono 12" nil t)
-
-
-
-(require 'evil)
-(evil-mode 1)
-
-(require 'evil-mc)
-(global-evil-mc-mode  1)
-
-(require 'evil-multiedit)
-(evil-multiedit-default-keybinds)
-
-(require 'find-file-in-project)
-
-(setq package-selected-packages '(lsp-mode yasnippet lsp-treemacs helm-lsp
-                                           projectile hydra flycheck company avy which-key helm-xref dap-mode))
-
-(when (cl-find-if-not #'package-installed-p package-selected-packages)
-  (package-refresh-contents)
-  (mapc #'package-install package-selected-packages))
-
-;; sample `helm' configuration use https://github.com/emacs-helm/helm/ for details
-(helm-mode)
-(require 'helm-xref)
-(define-key global-map [remap find-file] #'helm-find-files)
-(define-key global-map [remap execute-extended-command] #'helm-M-x)
-(define-key global-map [remap switch-to-buffer] #'helm-mini)
-
-
-
-(which-key-mode)
-(add-hook 'c-mode-hook 'lsp)
-(add-hook 'c++-mode-hook 'lsp)
-(add-hook 'kotlin-mode-hook 'lsp)
-(add-hook 'kotlin-ts-mode-hook 'lsp)
-;(add-hook 'vue-mode 'lsp)
-(add-hook 'web-mode-hook 'lsp)
-;(add-hook 'mmm-mode 'lsp)
-
-
-(setq lsp-enable-on-type-formatting nil)
-
-
-(setq gc-cons-threshold (* 100 1024 1024)
-      read-process-output-max (* 1024 1024)
-      treemacs-space-between-root-nodes nil
-      company-idle-delay 0.0
-      company-minimum-prefix-length 1
-      lsp-idle-delay 0.1)  ;; clangd is fast
-
-(with-eval-after-load 'lsp-mode
-  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
-  (require 'dap-cpptools)
-  (yas-global-mode)
-  (setq lsp-enable-on-type-formatting nil))
-
-
+;; Remove extra UI clutter by hiding the scrollbar, menubar, and toolbar.
 (menu-bar-mode -1)
-(scroll-bar-mode -1)
 (tool-bar-mode -1)
+(scroll-bar-mode -1)
+(desktop-save-mode 1)
 
+(setq scroll-conservatively 10)
+(setq scroll-margin 7)
 
-(global-display-line-numbers-mode)
+;; Set the font. Note: height = px * 100
+(set-face-attribute 'default nil :font "DejaVu Sans Mono" :height 120)
 
-(set-face-foreground 'vertical-border
-                     (face-background 'vertical-border nil t))
-
-
-;(defun include-paths ()
-;  (setq flycheck-clang-include-path (list 
-;                                     
-;                                     (expand-file-name "./_deps/*/include")
-;                                     (expand-file-name "./build/_deps/*/include")
-;                                     
-;
-;                                     )))
-;
-;(add-hook 'c++-mode-hook 'include-paths)
-
-
-(use-package flycheck
-  :ensure t
-  :config
-  (add-hook 'typescript-mode-hook 'flycheck-mode)
-  (add-hook 'kotlin-mode-hook 'flycheck-mode)
-  (add-hook 'kotlin-ts-mode-hook 'flycheck-mode))
-
-(use-package company
-  :ensure t
-  :config
-  (setq company-show-numbers t)
-  (setq company-tooltip-align-annotations t)
-  (setq company-tooltip-flip-when-above t)
-  (global-company-mode))
-
-(use-package company-quickhelp
-  :ensure t
-  :init
-  (company-quickhelp-mode 1)
-  (use-package pos-tip
-    :ensure t))
-
-(require 'shader-mode)
-
-;; uniquify changes conflicting buffer names from file<2> etc
+;; Add unique buffer names in the minibuffer where there are many
+;; identical files. This is super useful if you rely on folders for
+;; organization and have lots of files with the same name,
+;; e.g. foo/index.ts and bar/index.ts.
 (require 'uniquify)
-(setq uniquify-buffer-name-style 'reverse)
-(setq uniquify-separator "/")
-(setq uniquify-after-kill-buffer-p t) ; rename after killing uniquified
-(setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
 
-(require 'web-mode)
-;(require 'vue-mode)
-(require 'lsp-mode)
+;; Automatically insert closing parens
+(electric-pair-mode t)
 
-(load "web")
-(load "opts")
-(load "treemacs-config")
-(load "package-manage")
-(load "key-bind")
-(require 'glms-mode)
+;; Visualize matching parens
+(show-paren-mode 1)
 
-(use-package projectile
+;; Prefer spaces to tabs
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 2)
+(setq tab-width 2)
+
+;; Automatically save your place in files
+(save-place-mode t)
+
+;; Save history in minibuffer to keep recent commands easily accessible
+(savehist-mode t)
+
+;; Keep track of open files
+(recentf-mode t)
+
+;; Keep files up-to-date when they change outside Emacs
+(global-auto-revert-mode t)
+
+;; Display line numbers only when in programming modes
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+;; The `setq' special form is used for setting variables. Remember
+;; that you can look up these variables with "C-h v variable-name".
+(setq uniquify-buffer-name-style 'forward
+      window-resize-pixelwise t
+      frame-resize-pixelwise t
+      load-prefer-newer t
+      backup-by-copying t
+      ;; Backups are placed into your Emacs directory, e.g. ~/.config/emacs/backups
+      backup-directory-alist `(("." . ,(concat user-emacs-directory "backups")))
+      ;; I'll add an extra note here since user customizations are important.
+      ;; Emacs actually offers a UI-based customization menu, "M-x customize".
+      ;; You can use this menu to change variable values across Emacs. By default,
+      ;; changing a variable will write to your init.el automatically, mixing
+      ;; your hand-written Emacs Lisp with automatically-generated Lisp from the
+      ;; customize menu. The following setting instead writes customizations to a
+      ;; separate file, custom.el, to keep your init.el clean.
+      custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+
+
+(setq use-short-answers t)
+(setq confirm-nonexistent-file-or-buffer nil)
+(setq create-lockfiles nil)
+(setq warning-minimum-level :error)
+(defvar user-temporary-file-directory
+  (concat temporary-file-directory user-login-name "/"))
+(make-directory user-temporary-file-directory t)
+(setq backup-by-copying t)
+(setq backup-directory-alist
+      `(("." . ,user-temporary-file-directory)
+        (,tramp-file-name-regexp nil)))
+(setq auto-save-list-file-prefix
+      (concat user-temporary-file-directory ".auto-saves-"))
+(setq auto-save-file-name-transforms
+      `((".*" ,user-temporary-file-directory t)))
+
+;; Bring in package utilities so we can install packages from the web.
+(require 'package)
+
+;; Add MELPA, an unofficial (but well-curated) package registry to the
+;; list of accepted package registries. By default Emacs only uses GNU
+;; ELPA and NonGNU ELPA, https://elpa.gnu.org/ and
+;; https://elpa.nongnu.org/ respectively.
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+
+;; Unless we've already fetched (and cached) the package archives,
+;; refresh them.
+;(unless package-archive-contents
+;  (package-refresh-contents))
+
+(package-initialize)
+(unless package-archive-contents (package-refresh-contents))
+
+;; Add the :vc keyword to use-package, making it easy to install
+;; packages directly from git repositories.
+;(unless (package-installed-p 'vc-use-package)
+;  (package-vc-install "https://github.com/slotThe/vc-use-package"))
+;(require 'vc-use-package)
+
+;; A quick primer on the `use-package' function (refer to
+;; "C-h f use-package" for the full details).
+;;
+;; (use-package my-package-name
+;;   :ensure t    ; Ensure my-package is installed
+;;   :after foo   ; Load my-package after foo is loaded (seldom used)
+;;   :init        ; Run this code before my-package is loaded
+;;   :bind        ; Bind these keys to these functions
+;;   :custom      ; Set these variables
+;;   :config      ; Run this code after my-package is loaded
+
+;; A package with a great selection of themes:
+;; https://protesilaos.com/emacs/ef-themes
+;(use-package ef-themes
+;  :ensure t
+;  :config
+;  (ef-themes-select 'ef-autumn))
+
+(use-package persp-mode
+  :ensure t
+  :config
+      (add-hook 'window-setup-hook #'(lambda () (persp-mode 1))))
+
+(use-package gruvbox-theme
+  :config
+  (load-theme 'gruvbox-dark-medium t))
+
+
+
+;; Minibuffer completion is essential to your Emacs workflow and
+;; Vertico is currently one of the best out there. There's a lot to
+;; dive in here so I recommend checking out the documentation for more
+;; details: https://elpa.gnu.org/packages/vertico.html. The short and
+;; sweet of it is that you search for commands with "M-x do-thing" and
+;; the minibuffer will show you a filterable list of matches.
+(use-package vertico
+  :ensure t
+  :custom
+  (vertico-cycle t)
+  (read-buffer-completion-ignore-case t)
+  (read-file-name-completion-ignore-case t)
+  (completion-styles '(basic substring partial-completion flex))
+  :init
+  (vertico-mode))
+
+;; Improve the accessibility of Emacs documentation by placing
+;; descriptions directly in your minibuffer. Give it a try:
+;; "M-x find-file".
+(use-package marginalia
+  :after vertico
   :ensure t
   :init
-  (projectile-mode +1)
-  :bind (:map projectile-mode-map
-              ("s-p" . projectile-command-map)
-              ("C-c p" . projectile-command-map))
-  :config
-  (setq projectile-project-search-path '(("~/workspace/" . 1))))
+  (marginalia-mode))
+
+;; Adds intellisense-style code completion at point that works great
+;; with LSP via Eglot. You'll likely want to configure this one to
+;; match your editing preferences, there's no one-size-fits-all
+;; solution.
+;;(use-package corfu
+;;  :ensure t
+;;  :init
+;;  (global-corfu-mode)
+;;  :custom
+;;  (corfu-auto t)
+;;  ;; You may want to play with delay/prefix/styles to suit your preferences.
+;;  (corfu-auto-delay 0)
+;;  (corfu-auto-prefix 0)
+;;  (completion-styles '(basic)))
+
+;; Adds LSP support. Note that you must have the respective LSP
+;; server installed on your machine to use it with Eglot. e.g.
+;; rust-analyzer to use Eglot with `rust-mode'.
+;;(use-package eglot
+;;  :ensure t
+;;  :bind (("s-<mouse-1>" . eglot-find-implementation)
+;;         ("C-c ." . eglot-code-action-quickfix))
+;;  ;; Add your programming modes here to automatically start Eglot,
+;;  ;; assuming you have the respective LSP server installed.
+;;  :hook ((web-mode . eglot-ensure))
+;;  :config
+;;  ;; You can configure additional LSP servers by modifying
+;;  ;; `eglot-server-programs'. The following tells eglot to use TypeScript
+;;  ;; language server when working in `web-mode'.
+;;  (add-to-list 'eglot-server-programs
+;;               '(web-mode . ("typescript-language-server" "--stdio"))))
 
 
-(add-to-list 'image-types 'svg)
-;
-;(setq vue-mode-packages
-;  '(vue-mode lsp-mode web-mode))
-;
-;(setq vue-mode-excluded-packages '())
-;
-;
-;(defun vue-mode/init-vue-mode ()
-;  (use-package vue-mode
-;               :config
-;               ;; 0, 1, or 2, representing (respectively) none, low, and high coloring
-;               (setq mmm-submode-decoration-level 0)))
-;
-;(add-hook 'mmm-mode-hook
-;          (lambda ()
-;            (set-face-background 'mmm-default-submode-face nil)))
 
 
-;; I use Kotlin mode, not perfect, but works. Just start LSP when Kotlin mode starts.
-;; hook keyword replaces (add-to-list 'kotlin-mode-hook 'lsp)
-;; You can omit the hook and start lsp manually with M-x lsp if you want.
-(use-package kotlin-mode
-  :hook
-  (kotlin-mode . lsp))
-
-
-;; [2020-05-17 Sun] Disabling to prevent (lsp--auto-configure) from calling (lsp-ui-mode)
-(use-package lsp-ui
-  :disabled)
 
 (use-package lsp-mode
-  :demand t
-  :config
-  (defun md/lsp-setup()
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  (setq lsp-clients-clangd-args '("--header-insertion=never")) 
+  :commands lsp
+  :config (defun md/lsp-setup()
     ;; recommended by LSP docs for performance
     (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
@@ -334,7 +243,7 @@
           lsp-file-watch-threshold 100
           lsp-enable-folding t
           lsp-enable-imenu t
-          lsp-enable-indentation t
+          lsp-enable-indentation nil
           lsp-enable-links t
           lsp-clients-python-library-directories `("/usr/" ,(expand-file-name "~/.virtualenvs"), "./venv") ; This seems appropriate
           lsp-enable-on-type-formatting nil
@@ -361,12 +270,13 @@
        ("pyls.plugins.pycodestyle.enabled" nil t)
        ("pyls.plugins.mccabe.enabled" nil t)
        ("pyls.plugins.pyflakes.enabled" nil t))))
-  :hook
-   ;; NOTE: we don't have a python-mode hook - it gets handled by pyvenv-track-virtualenv
-  (;;(js-mode . lsp)
-   ;;(web-mode . lsp)
-   (lsp-mode . lsp-enable-which-key-integration)
-   (lsp-before-initialize . md/lsp-setup))
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (web-mode . lsp-deferred)
+         (tsx-ts-mode . lsp-deferred)
+         (typescript-mode . lsp-deferred)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration)
+         (lsp-before-initialize . md/lsp-setup))
   :bind (:map evil-normal-state-map
               ("gh" . lsp-describe-thing-at-point)
               ("gr" . lsp-find-references)
@@ -377,44 +287,170 @@
               ("Ff" . lsp-format-buffer)
               ("FR" . lsp-rename)))
 
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode)
+(use-package helm-lsp
+  :ensure t
+  :commands helm-lsp-workspace-symbol)
+(use-package lsp-ivy
+  :ensure t
+  :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs
+  :ensure t
+  :commands lsp-treemacs-errors-list)
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode))
 
 
-(add-hook 'c-mode-hook
-          (lambda ()
-            (set 'c-electric-flag t)))
-
-(add-hook 'c++-mode-hook
-          (lambda ()
-            (set 'c-electric-flag t)))
+(use-package typescript-mode
+  :ensure t
+  :config
+  (setq typescript-indent-level 2)
+  (add-hook 'typescript-mode #'subword-mode))
 
 
-;(setq electric-indent-chars (remq ?\{ electric-indent-chars))
+(use-package flycheck
+  :ensure t
+  :config
+  (add-hook 'typescript-mode-hook 'flycheck-mode)
+  (add-hook 'kotlin-mode-hook 'flycheck-mode)
+  (add-hook 'kotlin-ts-mode-hook 'flycheck-mode)
+  (flycheck-add-mode 'typescript-tslint 'web-mode))
 
-;(add-hook 'c-mode-hook
-;          (lambda ()
-;            (setq-local electric-indent-chars (remq ?\{ electric-indent-chars))))
+
+(use-package company
+  :ensure t
+  :config
+  (setq company-show-numbers t)
+  (setq company-tooltip-align-annotations t)
+  (setq company-tooltip-flip-when-above t)
+  (setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024)
+      treemacs-space-between-root-nodes nil
+      company-idle-delay 0.0
+      company-minimum-prefix-length 1
+      lsp-idle-delay 0.1) 
+  (global-company-mode))
+(add-hook 'after-init-hook 'global-company-mode)
+
+(use-package company-quickhelp
+  :after company
+  :ensure t
+  :init
+  (company-quickhelp-mode 1)
+  (use-package pos-tip
+    :ensure t))
+
+
+
+;; Add extra context to Emacs documentation to help make it easier to
+;; search and understand. This configuration uses the keybindings 
+;; recommended by the package author.
+;(use-package helpful
+;  :ensure t
+;  :bind (("C-h f" . #'helpful-callable)
+;         ("C-h v" . #'helpful-variable)
+;         ("C-h k" . #'helpful-key)
+;         ("C-c C-d" . #'helpful-at-point)
+;         ("C-h F" . #'helpful-function)
+;         ("C-h C" . #'helpful-command)))
+
+;; Adds vim emulation. Activate `evil-mode' to swap your default Emacs
+;; keybindings with the modal editor of great infamy. There's a ton of
+;; keybindings that Evil needs to modify, so this configuration also
+;; includes `evil-collection' to fill in the gaps.
+(use-package evil
+  :ensure t
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  :config
+  (evil-mode 1))
+
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init))
+
+
+;; Treemacs stuff
+(use-package treemacs
+  :ensure t
+  :init
+  (setq treemacs-collapse-dirs 0)
+  :config
+  (setq treemacs-collapse-dirs 0))
+
+(use-package treemacs-evil
+  :after (treemacs evil)
+  :ensure t)
+
+
+;; Snippets
+(use-package yasnippet                  ; Snippets
+  :ensure t
+  :config
+  (yas-global-mode 1))
+
+(use-package yasnippet-snippets         ; Collection of snippets
+  :ensure t)
+
+
+;; TypeScript, JS, and JSX/TSX support.
+(use-package web-mode
+  :ensure t
+  :mode (("\\.ts\\'" . web-mode)
+         ("\\.js\\'" . web-mode)
+         ("\\.mjs\\'" . web-mode)
+         ("\\.tsx\\'" . web-mode)
+         ("\\.jsx\\'" . web-mode))
+  :custom
+  (web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+  (web-mode-code-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-markup-indent-offset 2)
+  (web-mode-enable-auto-quoting nil)
+  :config
+  (setq web-mode-markup-indent-offset 2
+        web-mode-css-indent-offset 2
+        web-mode-code-indent-offset 2
+        web-mode-block-padding 2
+        web-mode-comment-style 2
+        web-mode-enable-css-colorization t
+        web-mode-enable-auto-pairing t
+        web-mode-enable-comment-keywords t
+        web-mode-enable-current-element-highlight t
+        ))
 
 
 
 
+;; Key-bindings
+(evil-define-key 'treemacs treemacs-mode-map (kbd "r") #'treemacs-rename-file)
+(evil-define-key 'treemacs treemacs-mode-map (kbd "yy") #'treemacs-copy-file)
+(global-set-key (kbd "<M-left>") 'windmove-left)
+(global-set-key (kbd "<M-right>") 'windmove-right)
+(global-set-key (kbd "<M-up>") 'windmove-up)
+(global-set-key (kbd "<M-down>") 'windmove-down)
+(defun toggle-treemacs ()
+  (interactive)
+  (save-excursion
+  (treemacs)
+  (treemacs-add-and-display-current-project-exclusively)
+  (message "Treemacs!")))
 
-(require 'c99-style)
-;; Customizations for all modes in CC Mode.
-(defun my-c-mode-common-hook ()
-  ;; add my personal style and set it for the current buffer
-  (c-add-style "PERSONAL" c99-style)
-  ;; other customizations
-  (setq tab-width 2)
-  ;; keybindings for all supported languages.  We can put these in
-  ;; c-mode-base-map because c-mode-map, c++-mode-map, objc-mode-map,
-  ;; java-mode-map, idl-mode-map, and pike-mode-map inherit from it.
-  (define-key c-mode-base-map "\C-m" 'newline-and-indent)
-  (define-key c-mode-base-map "\M-a" 'backward-sexp)
-  (define-key c-mode-base-map "\M-e" 'forward-sexp)
-  )
-
-(add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
-(setq c++-mode-hook
-      '(lambda ()
-         (font-lock-mode 1)
-         ))
+(global-set-key [f8] 'toggle-treemacs)
+(global-set-key [?\C-\=] 'text-scale-increase)
+(global-set-key [?\C-\+] 'text-scale-increase)
+(global-set-key [?\C-\-] 'text-scale-decrease)
+(global-set-key (kbd "M-s") 'find-file-in-project)
+(defun reload-init-file ()
+  (interactive)
+  (save-excursion
+  (load-file user-init-file)
+    (message "Reloaded init file.")))
+(global-set-key (kbd "C-c C-l") 'reload-init-file)
