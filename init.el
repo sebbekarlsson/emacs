@@ -22,20 +22,39 @@
 ;;; Code:
 
 ;; Performance tweaks for modern machines
-;(setq gc-cons-threshold 100000000) ; 100 mb
-;(setq read-process-output-max (* 1024 1024)) ; 1mb
+(setq gc-cons-threshold 100000000) ; 100 mb
+(setq read-process-output-max (* 1024 1024)) ; 1mb
 
 ;; Remove extra UI clutter by hiding the scrollbar, menubar, and toolbar.
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-(desktop-save-mode 1)
+
+(add-to-list 'load-path "~/.emacs.d/include")
+
+(use-package desktop
+  :ensure t
+  :config
+  (defun restore-desktop (frame)
+    "Restores desktop and cancels hook after first frame opens.
+     So the daemon can run at startup and it'll still work"
+    (with-selected-frame frame
+      (desktop-save-mode 1)
+      (desktop-read)
+      (remove-hook 'after-make-frame-functions 'restore-desktop)))
+  (add-to-list 'desktop-globals-to-save 'dirvish--history)
+  (setq desktop-restore-forces-onscreen nil)
+  (setq desktop-restore-eager 5)
+  (setq desktop-auto-save-timeout 5)
+  (add-hook 'after-make-frame-functions 'restore-desktop))
+
+;(desktop-save-mode 1)
 
 (setq scroll-conservatively 10)
 (setq scroll-margin 7)
 
 ;; Set the font. Note: height = px * 100
-(set-face-attribute 'default nil :font "DejaVu Sans Mono" :height 120)
+(set-face-attribute 'default nil :font "Noto Sans Mono" :height 120)
 
 ;; Add unique buffer names in the minibuffer where there are many
 ;; identical files. This is super useful if you rely on folders for
@@ -55,13 +74,13 @@
 (setq tab-width 2)
 
 ;; Automatically save your place in files
-(save-place-mode t)
+; (save-place-mode t)
 
 ;; Save history in minibuffer to keep recent commands easily accessible
 (savehist-mode t)
 
 ;; Keep track of open files
-(recentf-mode t)
+; (recentf-mode t)
 
 ;; Keep files up-to-date when they change outside Emacs
 (global-auto-revert-mode t)
@@ -124,9 +143,9 @@
 
 ;; Add the :vc keyword to use-package, making it easy to install
 ;; packages directly from git repositories.
-;(unless (package-installed-p 'vc-use-package)
-;  (package-vc-install "https://github.com/slotThe/vc-use-package"))
-;(require 'vc-use-package)
+(unless (package-installed-p 'vc-use-package)
+  (package-vc-install "https://github.com/slotThe/vc-use-package"))
+(require 'vc-use-package)
 
 ;; A quick primer on the `use-package' function (refer to
 ;; "C-h f use-package" for the full details).
@@ -146,14 +165,37 @@
 ;  :config
 ;  (ef-themes-select 'ef-autumn))
 
-(use-package persp-mode
+;(use-package persp-mode
+;  :ensure t
+;  :config
+;      (add-hook 'window-setup-hook #'(lambda () (persp-mode 1))))
+
+
+(use-package all-the-icons
+  :ensure t)
+
+(use-package doom-themes
+  :after all-the-icons
   :ensure t
   :config
-      (add-hook 'window-setup-hook #'(lambda () (persp-mode 1))))
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-one t)
 
-(use-package gruvbox-theme
-  :config
-  (load-theme 'gruvbox-dark-medium t))
+  ;; Enable flashing mode-line on errors
+  ;(doom-themes-visual-bell-config)
+  ;; Enable custom neotree theme (all-the-icons must be installed!)
+  (doom-themes-neotree-config)
+  ;; or for treemacs users
+  (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+
+;(use-package gruvbox-theme
+;  :config
+;  (load-theme 'gruvbox-dark-medium t))
 
 
 
@@ -218,78 +260,11 @@
 
 
 
-(use-package lsp-mode
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
-  (setq lsp-clients-clangd-args '("--header-insertion=never")) 
-  :commands lsp
-  :config (defun md/lsp-setup()
-    ;; recommended by LSP docs for performance
-    (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
-    (lsp-enable-imenu)
-    (setq
-          lsp-auto-configure t
-          lsp-enable-dap-auto-configure nil ; Don't try to auto-enable dap: this creates a lot of binding clashes
-          lsp-auto-guess-root t ; Uses projectile to guess the project root.
-          lsp-before-save-edits t
-          lsp-eldoc-enable-hover t
-          lsp-eldoc-render-all nil
-          lsp-completion-enable t
-          lsp-completion-show-detail t
-          lsp-completion-show-kind t
-          lsp-enable-file-watchers t
-          lsp-file-watch-threshold 100
-          lsp-enable-folding t
-          lsp-enable-imenu t
-          lsp-enable-indentation nil
-          lsp-enable-links t
-          lsp-clients-python-library-directories `("/usr/" ,(expand-file-name "~/.virtualenvs"), "./venv") ; This seems appropriate
-          lsp-enable-on-type-formatting nil
-          lsp-enable-snippet nil  ;; Not supported by company capf, which is the recommended company backend
-          lsp-enable-symbol-highlighting nil
-          lsp-enable-text-document-color nil
-          lsp-enable-xref t
-          lsp-flycheck-live-reporting nil
-          lsp-idle-delay 0.1
-          lsp-imenu-show-container-name t
-          lsp-imenu-sort-methods '(position kind name)
-          lsp-pyls-plugins-flake8-enabled t
-          lsp-signature-auto-activate t
-          lsp-signature-render-documentation t
-          lsp-signature-doc-lines 10
-          lsp-headerline-breadcrumb-enable nil)
-    (lsp-register-custom-settings
-     '(
 
-       ("pyls.plugins.pyls_black.enabled" t t)
-       ("pyls.plugins.pyls_isort.enabled" t t)
-
-       ;; Disable these as they're duplicated by flake8
-       ("pyls.plugins.pycodestyle.enabled" nil t)
-       ("pyls.plugins.mccabe.enabled" nil t)
-       ("pyls.plugins.pyflakes.enabled" nil t))))
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (web-mode . lsp-deferred)
-         (tsx-ts-mode . lsp-deferred)
-         (typescript-mode . lsp-deferred)
-         ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration)
-         (lsp-before-initialize . md/lsp-setup))
-  :bind (:map evil-normal-state-map
-              ("gh" . lsp-describe-thing-at-point)
-              ("gr" . lsp-find-references)
-              ("gD" . lsp-find-implementation)
-              ("gd" . lsp-find-definition)
-              ;:map md/leader-map
-              ("Ni" . imenu)
-              ("Ff" . lsp-format-buffer)
-              ("FR" . lsp-rename)))
-
-(use-package lsp-ui
-  :ensure t
-  :commands lsp-ui-mode)
+;(use-package lsp-ui
+;  :ensure t
+;  :commands lsp-ui-mode)
 (use-package helm-lsp
   :ensure t
   :commands helm-lsp-workspace-symbol)
@@ -377,13 +352,107 @@
   (evil-collection-init))
 
 
+(use-package lsp-mode
+  :after evil
+  :ensure t
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  (setq lsp-clients-clangd-args '("--header-insertion=never")) 
+  :commands lsp
+  :custom
+  (lsp-enable-snippet t)
+  :config (defun md/lsp-setup()
+    ;; recommended by LSP docs for performance
+    (setq read-process-output-max (* 1024 1024)) ;; 1mb
+
+    (lsp-enable-imenu)
+    (setq
+          lsp-auto-configure t
+          lsp-enable-dap-auto-configure nil ; Don't try to auto-enable dap: this creates a lot of binding clashes
+          lsp-auto-guess-root t ; Uses projectile to guess the project root.
+          lsp-before-save-edits t
+          lsp-eldoc-enable-hover t
+          lsp-eldoc-render-all nil
+          lsp-completion-enable t
+          lsp-completion-show-detail t
+          lsp-completion-show-kind t
+          lsp-enable-file-watchers t
+          lsp-file-watch-threshold 100
+          lsp-enable-folding t
+          lsp-enable-imenu t
+          lsp-enable-indentation t
+          lsp-enable-links t
+          lsp-clients-python-library-directories `("/usr/" ,(expand-file-name "~/.virtualenvs"), "./venv") ; This seems appropriate
+          lsp-enable-on-type-formatting nil
+          lsp-enable-snippet nil  ;; Not supported by company capf, which is the recommended company backend
+          lsp-enable-symbol-highlighting nil
+          lsp-enable-text-document-color nil
+          lsp-enable-xref t
+          lsp-flycheck-live-reporting nil
+          lsp-idle-delay 0.1
+          lsp-imenu-show-container-name t
+          lsp-imenu-sort-methods '(position kind name)
+          lsp-pyls-plugins-flake8-enabled t
+          lsp-signature-auto-activate t
+          lsp-signature-render-documentation t
+          lsp-signature-doc-lines 10
+          lsp-javascript-suggest-complete-function-calls t
+          lsp-typescript-suggest-complete-function-calls t
+          lsp-headerline-breadcrumb-enable nil)
+    (lsp-register-custom-settings
+     '(
+
+       ("pyls.plugins.pyls_black.enabled" t t)
+       ("pyls.plugins.pyls_isort.enabled" t t)
+
+       ;; Disable these as they're duplicated by flake8
+       ("pyls.plugins.pycodestyle.enabled" nil t)
+       ("pyls.plugins.mccabe.enabled" nil t)
+       ("pyls.plugins.pyflakes.enabled" nil t))))
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (web-mode . lsp-deferred)
+         (tsx-ts-mode . lsp-deferred)
+         (typescript-mode . lsp-deferred)
+         (c-mode . lsp-deferred)
+         (c++-mode . lsp-deferred)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration)
+         (lsp-before-initialize . md/lsp-setup))
+  :bind (:map evil-normal-state-map
+              ("gh" . lsp-describe-thing-at-point)
+              ("gr" . lsp-find-references)
+              ("gD" . lsp-find-implementation)
+              ("gd" . lsp-find-definition)
+              ;:map md/leader-map
+              ("Ni" . imenu)
+              ("Ff" . lsp-format-buffer)
+              ("FR" . lsp-rename)))
+
+
+;(defun my/lsp ()
+;  (unless (eq major-mode <REPLACE-ME-WITH-MAJOR-MODE>)
+;    (lsp)))
+
 ;; Treemacs stuff
 (use-package treemacs
   :ensure t
+  :defer t
   :init
+  (setq treemacs-tag-follow-mode -1)
+  (setq treemacs-follow-mode -1)
   (setq treemacs-collapse-dirs 0)
   :config
-  (setq treemacs-collapse-dirs 0))
+  (setq treemacs-collapse-dirs 0)
+  (setq treemacs-tag-follow-mode -1)
+  (setq treemacs-follow-mode -1)
+  (treemacs-tag-follow-mode -1)
+  (treemacs-follow-mode -1)
+  )
+
+(with-eval-after-load 'treemacs-mode
+  (treemacs-tag-follow-mode -1)
+  (treemacs-follow-mode -1))
 
 (use-package treemacs-evil
   :after (treemacs evil)
@@ -396,37 +465,39 @@
   :config
   (yas-global-mode 1))
 
-(use-package yasnippet-snippets         ; Collection of snippets
-  :ensure t)
+;(use-package yasnippet-snippets         ; Collection of snippets
+;  :ensure t)
 
 
 ;; TypeScript, JS, and JSX/TSX support.
-(use-package web-mode
+(load "config-web")
+(load "config-c")
+
+
+(use-package evil-multiedit
+ :ensure t)
+
+(use-package fzf
+               :bind
+                   ;; Don't forget to set keybinds!
+                     :config
+                       (setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
+                                     fzf/executable "fzf"
+                                             fzf/git-grep-args "-i --line-number %s"
+                                                     ;; command used for `fzf-grep-*` functions
+                                                             ;; example usage for ripgrep:
+                                                                     ;; fzf/grep-command "rg --no-heading -nH"
+                                                                             fzf/grep-command "grep -nrH"
+                                                                                     ;; If nil, the fzf buffer will appear at the top of the window
+                                                                                             fzf/position-bottom t
+                                                                                                     fzf/window-height 15))
+(use-package undo-tree
   :ensure t
-  :mode (("\\.ts\\'" . web-mode)
-         ("\\.js\\'" . web-mode)
-         ("\\.mjs\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode))
-  :custom
-  (web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
-  (web-mode-code-indent-offset 2)
-  (web-mode-css-indent-offset 2)
-  (web-mode-markup-indent-offset 2)
-  (web-mode-enable-auto-quoting nil)
+  :after evil
+  :diminish
   :config
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-        web-mode-block-padding 2
-        web-mode-comment-style 2
-        web-mode-enable-css-colorization t
-        web-mode-enable-auto-pairing t
-        web-mode-enable-comment-keywords t
-        web-mode-enable-current-element-highlight t
-        ))
-
-
+  (evil-set-undo-system 'undo-tree)
+  (global-undo-tree-mode 1))
 
 
 ;; Key-bindings
@@ -448,9 +519,91 @@
 (global-set-key [?\C-\+] 'text-scale-increase)
 (global-set-key [?\C-\-] 'text-scale-decrease)
 (global-set-key (kbd "M-s") 'find-file-in-project)
+
+
 (defun reload-init-file ()
   (interactive)
   (save-excursion
   (load-file user-init-file)
     (message "Reloaded init file.")))
-(global-set-key (kbd "C-c C-l") 'reload-init-file)
+
+;;
+;; Multiedit
+;;
+;; Highlights all matches of the selection in the buffer.
+(define-key evil-visual-state-map "R" 'evil-multiedit-match-all)
+;; Match the word under cursor (i.e. make it an edit region). Consecutive presses will
+;; incrementally add the next unmatched match.
+(define-key evil-normal-state-map (kbd "M-d") 'evil-multiedit-match-and-next)
+;; Match selected region.
+(define-key evil-visual-state-map (kbd "M-d") 'evil-multiedit-match-and-next)
+;; Insert marker at point
+;(define-key evil-insert-state-map (kbd "M-d") 'evil-multiedit-toggle-marker-here)
+
+;; Same as M-d but in reverse.
+(define-key evil-normal-state-map (kbd "M-D") 'evil-multiedit-match-and-prev)
+(define-key evil-visual-state-map (kbd "M-D") 'evil-multiedit-match-and-prev)
+
+;; OPTIONAL: If you prefer to grab symbols rather than words, use
+;; `evil-multiedit-match-symbol-and-next` (or prev).
+
+;; Restore the last group of multiedit regions.
+(define-key evil-visual-state-map (kbd "C-M-D") 'evil-multiedit-restore)
+
+;; RET will toggle the region under the cursor
+; (define-key evil-multiedit-state-map (kbd "RET") 'evil-multiedit-toggle-or-restrict-region)
+
+;; ...and in visual mode, RET will disable all fields outside the selected region
+(define-key evil-motion-state-map (kbd "RET") 'evil-multiedit-toggle-or-restrict-region)
+
+;; For moving between edit regions
+;(define-key evil-multiedit-state-map (kbd "C-n") 'evil-multiedit-next)
+;(define-key evil-multiedit-state-map (kbd "C-p") 'evil-multiedit-prev)
+;(define-key evil-multiedit-insert-state-map (kbd "C-n") 'evil-multiedit-next)
+;(define-key evil-multiedit-insert-state-map (kbd "C-p") 'evil-multiedit-prev)
+
+;; Ex command that allows you to invoke evil-multiedit with a regular expression, e.g.
+(evil-ex-define-cmd "ie[dit]" 'evil-multiedit-ex-match)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun my/do-then-quit (&rest args)
+  (let ((win (selected-window)))
+    (apply (car args) (rest args))
+    (quit-window nil win)))
+
+(advice-add #'xref-goto-xref :around #'my/do-then-quit)
+
+
+;;;;;;;;;;;;;;;
+
+(use-package restart-emacs
+  :ensure t
+	:config
+	(setq restart-emacs-restore-frames t))
+
+
+(require 'compile)
+
+(add-to-list 'compilation-error-regexp-alist-alist
+             '(my-search-program
+               "^\\(/[^:]+\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))
+
+(add-to-list 'compilation-error-regexp-alist 'my-search-program)
+
+
+
+(defun run-search-program (directory search-term)
+  "Run the search_program executable with the specified DIRECTORY and SEARCH-TERM, and display the output in a buffer."
+  (interactive "DDirectory: \nsSearch term: ")
+  (let ((output-buffer (get-buffer-create "*Search Program Output*"))
+        (command (format "/home/ianertson/workspace/qs/build/qs %s %s" directory search-term)))
+    (with-current-buffer output-buffer
+      (read-only-mode -1)
+      (erase-buffer)
+      (insert (format "Running command: %s\n\n" command))
+      (let ((exit-code (call-process-shell-command command nil output-buffer)))
+        (insert (format "\n\nProcess finished with exit code %d" exit-code))
+        (read-only-mode 1))
+      (compilation-mode))
+    (display-buffer output-buffer)))
+
