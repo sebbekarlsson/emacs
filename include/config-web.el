@@ -16,6 +16,7 @@
   :mode (("\\.ts\\'" . web-mode)
          ("\\.js\\'" . web-mode)
          ("\\.mjs\\'" . web-mode)
+         ("\\.mts\\'" . typescript-mode)
          ("\\.tsx\\'" . web-mode)
          ("\\.jsx\\'" . web-mode))
   :custom
@@ -41,6 +42,15 @@
 ;		(setup-tide-mode))))
   )
 
+
+(add-hook 'json-mode-hook
+          (lambda ()
+            (make-local-variable 'js-indent-level)
+            (setq tab-width 2)
+            (setq js-indent-level 2)))
+
+
+(setq js-indent-level 2)
 ;
 ;(use-package tide
 ;  :init
