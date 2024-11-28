@@ -500,6 +500,35 @@
   (global-undo-tree-mode 1))
 
 
+(defun toggle-tabs ()
+  (interactive)
+  (save-excursion
+  (tab-line-mode)
+  (message "Tabs!")))
+
+(defun maybe-toggle-tabs ()
+  (interactive)
+  (save-excursion
+  (if (bound-and-true-p tab-line-mode)
+    (message "tabs already on")
+  (toggle-tabs))))
+
+
+
+
+(defun tabs-prev ()
+  (interactive)
+  (save-excursion
+  (maybe-toggle-tabs)
+  (tab-line-switch-to-prev-tab)
+  ))
+
+(defun tabs-next ()
+  (interactive)
+  (save-excursion
+  (maybe-toggle-tabs)
+  (tab-line-switch-to-next-tab)
+  ))
 ;; Key-bindings
 (evil-define-key 'treemacs treemacs-mode-map (kbd "r") #'treemacs-rename-file)
 (evil-define-key 'treemacs treemacs-mode-map (kbd "yy") #'treemacs-copy-file)
@@ -507,6 +536,8 @@
 (global-set-key (kbd "<M-right>") 'windmove-right)
 (global-set-key (kbd "<M-up>") 'windmove-up)
 (global-set-key (kbd "<M-down>") 'windmove-down)
+(global-set-key (kbd "M-1") 'tabs-prev)
+(global-set-key (kbd "M-2") 'tabs-next)
 (defun toggle-treemacs ()
   (interactive)
   (save-excursion
@@ -514,11 +545,14 @@
   (treemacs-add-and-display-current-project-exclusively)
   (message "Treemacs!")))
 
+
+
 (global-set-key [f8] 'toggle-treemacs)
+;;(global-set-key [f7] 'toggle-tabs)
 (global-set-key [?\C-\=] 'text-scale-increase)
 (global-set-key [?\C-\+] 'text-scale-increase)
 (global-set-key [?\C-\-] 'text-scale-decrease)
-(global-set-key (kbd "M-s") 'find-file-in-project)
+(global-set-key (kbd "M-s") 'fzf-git)
 
 
 (defun reload-init-file ()
@@ -566,12 +600,12 @@
 (evil-ex-define-cmd "ie[dit]" 'evil-multiedit-ex-match)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun my/do-then-quit (&rest args)
-  (let ((win (selected-window)))
-    (apply (car args) (rest args))
-    (quit-window nil win)))
-
-(advice-add #'xref-goto-xref :around #'my/do-then-quit)
+;(defun my/do-then-quit (&rest args)
+;  (let ((win (selected-window)))
+;    (apply (car args) (rest args))
+;    (quit-window nil win)))
+;
+;(advice-add #'xref-goto-xref :around #'my/do-then-quit)
 
 
 ;;;;;;;;;;;;;;;
