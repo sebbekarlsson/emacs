@@ -22,8 +22,8 @@
 ;;; Code:
 
 ;; Performance tweaks for modern machines
-(setq gc-cons-threshold 100000000) ; 100 mb
-(setq read-process-output-max (* 1024 1024)) ; 1mb
+(setq read-process-output-max (* 10 1024 1024)) ;; 10mb
+(setq gc-cons-threshold 200000000)
 
 ;; Remove extra UI clutter by hiding the scrollbar, menubar, and toolbar.
 (menu-bar-mode -1)
@@ -265,15 +265,7 @@
 ;(use-package lsp-ui
 ;  :ensure t
 ;  :commands lsp-ui-mode)
-(use-package helm-lsp
-  :ensure t
-  :commands helm-lsp-workspace-symbol)
-(use-package lsp-ivy
-  :ensure t
-  :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs
-  :ensure t
-  :commands lsp-treemacs-errors-list)
+
 (use-package which-key
   :ensure t
   :config
@@ -295,19 +287,18 @@
   (add-hook 'kotlin-ts-mode-hook 'flycheck-mode)
   (flycheck-add-mode 'typescript-tslint 'web-mode))
 
-
 (use-package company
   :ensure t
   :config
   (setq company-show-numbers t)
   (setq company-tooltip-align-annotations t)
   (setq company-tooltip-flip-when-above t)
-  (setq gc-cons-threshold (* 100 1024 1024)
-      read-process-output-max (* 1024 1024)
+  (setq gc-cons-threshold 200000000
+      read-process-output-max (* 10 1024 1024)
       treemacs-space-between-root-nodes nil
-      company-idle-delay 0.0
+      company-idle-delay 0.5
       company-minimum-prefix-length 1
-      lsp-idle-delay 0.1) 
+      lsp-idle-delay 0.5) 
   (global-company-mode))
 (add-hook 'after-init-hook 'global-company-mode)
 
@@ -352,82 +343,7 @@
   (evil-collection-init))
 
 
-(use-package lsp-mode
-  :after evil
-  :ensure t
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
-  (setq lsp-clients-clangd-args '("--header-insertion=never")) 
-  :commands lsp
-  :custom
-  (lsp-enable-snippet t)
-  :config (defun md/lsp-setup()
-    ;; recommended by LSP docs for performance
-    (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
-    (lsp-enable-imenu)
-    (setq
-          lsp-auto-configure t
-          lsp-enable-dap-auto-configure nil ; Don't try to auto-enable dap: this creates a lot of binding clashes
-          lsp-auto-guess-root t ; Uses projectile to guess the project root.
-          lsp-before-save-edits t
-          lsp-eldoc-enable-hover t
-          lsp-eldoc-render-all nil
-          lsp-completion-enable t
-          lsp-completion-show-detail t
-          lsp-completion-show-kind t
-          lsp-enable-file-watchers t
-          lsp-file-watch-threshold 100
-          lsp-enable-folding t
-          lsp-enable-imenu t
-          lsp-enable-indentation t
-          lsp-enable-links t
-          lsp-clients-python-library-directories `("/usr/" ,(expand-file-name "~/.virtualenvs"), "./venv") ; This seems appropriate
-          lsp-enable-on-type-formatting nil
-          lsp-enable-snippet nil  ;; Not supported by company capf, which is the recommended company backend
-          lsp-enable-symbol-highlighting nil
-          lsp-enable-text-document-color nil
-          lsp-enable-xref t
-          lsp-flycheck-live-reporting nil
-          lsp-idle-delay 0.1
-          lsp-imenu-show-container-name t
-          lsp-imenu-sort-methods '(position kind name)
-          lsp-pyls-plugins-flake8-enabled t
-          lsp-signature-auto-activate t
-          lsp-signature-render-documentation t
-          lsp-signature-doc-lines 10
-          lsp-javascript-suggest-complete-function-calls t
-          lsp-typescript-suggest-complete-function-calls t
-          lsp-headerline-breadcrumb-enable nil)
-    (lsp-register-custom-settings
-     '(
-
-       ("pyls.plugins.pyls_black.enabled" t t)
-       ("pyls.plugins.pyls_isort.enabled" t t)
-
-       ;; Disable these as they're duplicated by flake8
-       ("pyls.plugins.pycodestyle.enabled" nil t)
-       ("pyls.plugins.mccabe.enabled" nil t)
-       ("pyls.plugins.pyflakes.enabled" nil t))))
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (web-mode . lsp-deferred)
-         (tsx-ts-mode . lsp-deferred)
-         (typescript-mode . lsp-deferred)
-         (c-mode . lsp-deferred)
-         (c++-mode . lsp-deferred)
-         ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration)
-         (lsp-before-initialize . md/lsp-setup))
-  :bind (:map evil-normal-state-map
-              ("gh" . lsp-describe-thing-at-point)
-              ("gr" . lsp-find-references)
-              ("gD" . lsp-find-implementation)
-              ("gd" . lsp-find-definition)
-              ;:map md/leader-map
-              ("Ni" . imenu)
-              ("Ff" . lsp-format-buffer)
-              ("FR" . lsp-rename)))
 
 
 ;(defun my/lsp ()
@@ -468,6 +384,7 @@
 ;(use-package yasnippet-snippets         ; Collection of snippets
 ;  :ensure t)
 
+(load "lsp-stuff")
 
 ;; TypeScript, JS, and JSX/TSX support.
 (load "config-web")
@@ -641,3 +558,14 @@
       (compilation-mode))
     (display-buffer output-buffer)))
 
+
+
+
+(defun lsp-set-root (rootdir)
+  (interactive "DRoot: ")
+  (setq project-root rootdir)
+  (run-hook-with-args 'lsp-workspace-folders-changed-functions nil (list rootdir))
+  (message "Root set to %s\n" rootdir))
+
+;;(defun lsp-set-root
+;  (setq project-root (lsp-f-canonical project-root)))

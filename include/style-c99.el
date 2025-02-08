@@ -1,6 +1,6 @@
-;;; c99-style.el --- Google's C/C++ style for c-mode
+;;; c99-style.el --- C99's C/C++ style for c-mode
 ;; Keywords: c, tools
-;; c99-style.el is Copyright (C) 2008 Google Inc. All Rights Reserved.
+;; c99-style.el is Copyright (C) 2008 C99 Inc. All Rights Reserved.
 ;;
 ;; It is free software; you can redistribute it and/or modify it under the
 ;; terms of either:
@@ -10,16 +10,16 @@
 ;;
 ;; b) the "Artistic License".
 ;;; Commentary:
-;; Provides the google C/C++ coding style. You may wish to add
-;; `google-set-c-style' to your `c-mode-common-hook' after requiring this
+;; Provides the c99 C/C++ coding style. You may wish to add
+;; `c99-set-c-style' to your `c-mode-common-hook' after requiring this
 ;; file. For example:
 ;;
-;;    (add-hook 'c-mode-common-hook 'google-set-c-style)
+;;    (add-hook 'c-mode-common-hook 'c99-set-c-style)
 ;;
 ;; If you want the RETURN key to go to the next line and space over
 ;; to the right place, add this to your .emacs right after the load-file:
 ;;
-;;    (add-hook 'c-mode-common-hook 'google-make-newline-indent)
+;;    (add-hook 'c-mode-common-hook 'c99-make-newline-indent)
 ;;; Code:
 ;; For some reason 1) c-backward-syntactic-ws is a macro and 2)  under Emacs 22
 ;; bytecode cannot call (unexpanded) macros at run time:
@@ -27,12 +27,12 @@
 ;; Wrapper function needed for Emacs 21 and XEmacs (Emacs 22 offers the more
 ;; elegant solution of composing a list of lineup functions or quantities with
 ;; operators such as "add")
-(defun google-c-lineup-expression-plus-2 (langelem)
+(defun c99-c-lineup-expression-plus-2 (langelem)
   "Indents to the beginning of the current C expression plus 2 spaces.
 This implements title \"Function Declarations and Definitions\"
-of the Google C++ Style Guide for the case where the previous
+of the C99 C++ Style Guide for the case where the previous
 line ends with an open parenthese.
-\"Current C expression\", as per the Google Style Guide and as
+\"Current C expression\", as per the C99 Style Guide and as
 clarified by subsequent discussions, means the whole expression
 regardless of the number of nested parentheses, but excluding
 non-expression material such as \"if(\" and \"for(\" control
@@ -94,7 +94,7 @@ Suitable for inclusion in `c-offsets-alist'."
                        defun-close-semi
                        list-close-comma
                        scope-operator))
-    (c-offsets-alist . ((arglist-intro google-c-lineup-expression-plus-2)
+    (c-offsets-alist . ((arglist-intro c99-c-lineup-expression-plus-2)
                         (func-decl-cont . ++)
                         (member-init-intro . ++)
                         (inher-intro . ++)
@@ -117,17 +117,17 @@ Suitable for inclusion in `c-offsets-alist'."
                         (statement-case-intro . +) ; case w/o {
                         (access-label . /)
                         (innamespace . 0))))
-  "Google C/C++ Programming Style.")
+  "C99 C/C++ Programming Style.")
 ;;;###autoload
-(defun google-set-c-style ()
-  "Set the current buffer's c-style to Google C/C++ Programming
+(defun c99-set-c-style ()
+  "Set the current buffer's c-style to C99 C/C++ Programming
   Style. Meant to be added to `c-mode-common-hook'."
   (interactive)
   (make-local-variable 'c-tab-always-indent)
   (setq c-tab-always-indent t)
-  (c-add-style "Google" c99-style t))
+  (c-add-style "C99" c99-style t))
 ;;;###autoload
-(defun google-make-newline-indent ()
+(defun c99-make-newline-indent ()
   "Sets up preferred newline behavior. Not set by default. Meant
   to be added to `c-mode-common-hook'."
   (interactive)
