@@ -50,5 +50,15 @@
 (global-set-key [?\C-\+] 'text-scale-increase)
 (global-set-key [?\C-\-] 'text-scale-decrease)
 
+(defun my/treemacs-after-create-file-advice (&rest _)
+  "Restart lsp-bridge after creating a file in treemacs."
+  (run-at-time
+   "0.1 sec" nil
+   (lambda ()
+     (when buffer-file-name
+       (lsp-bridge-restart-process)))))
+
+(advice-add 'treemacs-create-file :after #'my/treemacs-after-create-file-advice)
+
 (provide 'ui)
 

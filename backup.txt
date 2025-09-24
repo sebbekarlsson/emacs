@@ -1,4 +1,4 @@
-(add-to-list 'load-path (expand-file-name "v2" user-emacs-directory))
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
 (electric-pair-mode t)
 (show-paren-mode 1)
@@ -8,8 +8,8 @@
 
 (require 'core)
 (require 'packages)
-(require 'hooks)
-(require 'keybinds)
+(require 'ui)
+(require 'langs)
 
 (setq gc-cons-threshold (* 50 1000 1000)) ; 50MB GC threshold
 (run-with-idle-timer 5 t #'garbage-collect)
@@ -19,7 +19,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(helm-minibuffer-history-key "M-p")
  '(package-selected-packages nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
