@@ -38,6 +38,8 @@
 (setq js-indent-level 2)
 
 
+
+
 (defun my-c-setup ()
   (c-add-style "Google" google-c-style t)
 
@@ -53,11 +55,11 @@
                                 (annotation-var-cont . +)
                                 (arglist-close . c-lineup-close-paren)
                                 (arglist-cont c-lineup-gcc-asm-reg 0)
-                                (arglist-cont-nonempty
-                                 . c-lineup-arglist)
+                                ;(arglist-cont-nonempty . c-lineup-arglist)
+                                (arglist-cont-nonempty . 0)
                                 (arglist-intro . +)
-                                ;(block-close . 0)
-                                (block-close . -)
+                                (block-close . 0)
+                                ;(block-close . -)
                                 (block-open . 0)
                                 (brace-entry-open . 0)
                                 (brace-list-open . 0)
@@ -104,8 +106,9 @@
                                  c-lineup-ObjC-method-call-colons
                                  c-lineup-ObjC-method-call +)
                                 (objc-method-intro . [0])
-                                ;(statement-block-intro . +)
-                                (statement-block-intro . 0)
+                                (statement-block-intro . +)
+                                ;(statement-block-intro . 0)
+                                ;(statement-block-intro . muckintosh)
                                 (statement-case-intro . +)
                                 (statement-case-open . 0)
                                 ;(statement-cont . +)
@@ -121,16 +124,41 @@
                                 (topmost-intro-cont
                                  . c-lineup-topmost-intro-cont))))
 
-  
+
       (setq c-default-style "better-c-style")
       (c-set-style "better-c-style")
       (c-set-offset 'brace-list-entry 0)
       (c-set-offset 'statement-cont 0)
+      ;(c-set-offset 'statement-block-intro #'my-c-indentation-logic)
       )
 
 (add-hook 'c-mode-hook 'my-c-setup)
 (add-hook 'c-mode-common-hook 'my-c-setup)
-(setq c-default-style "better-c-style")
+;(setq c-default-style "better-c-style")
+
+
+;(defun un-indent-by-removing-4-spaces ()
+;  "remove 4 spaces from beginning of of line"
+;  (interactive)
+;  (save-excursion
+;    (save-match-data
+;      (beginning-of-line)
+;      (when (looking-at "\{\}")
+;        (message "yo")
+;        (replace-match "  \}")))))
+;
+;
+;
+;(defun myadvice (orig-fun &rest args)
+;  (let* ((cur-line (buffer-substring-no-properties
+;                    (line-beginning-position)
+;                    (line-end-position))))
+;    (apply orig-fun args)
+;    (message cur-line)
+;    (when (string-match ".*?\\w+.*?(.*?).*?{" cur-line)
+;		   (un-indent-by-removing-4-spaces))))
+
+;(advice-add 'newline :around #'myadvice)
 
 
 (provide 'hooks)
