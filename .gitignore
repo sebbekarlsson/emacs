@@ -77,3 +77,4 @@ tags
 /transient
 /.cache/
 eln-cache
+dummy.c
