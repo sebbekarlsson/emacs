@@ -21,7 +21,12 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(helm-minibuffer-history-key "M-p")
- '(package-selected-packages nil))
+ '(package-selected-packages
+   '(cmake-mode company dap-mode doom-modeline doom-themes
+                evil-collection evil-iedit-state evil-multiedit
+                exec-path-from-shell flycheck glsl-mode helm-lsp jsonl
+                lsp-ivy lsp-pyright lsp-ui restart-emacs treemacs-evil
+                undo-tree vertico web-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
