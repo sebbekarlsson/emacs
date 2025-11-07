@@ -31,8 +31,14 @@
   (evil-set-undo-system 'undo-tree)
   (global-undo-tree-mode 1))
 
-;(use-package yasnippet
-;  :config (yas-global-mode 1))
+(use-package yasnippet
+  :ensure t
+  :after evil
+  :config
+  (yas-global-mode 1)
+  (setq yas-indent-line nil)
+  (setq yas-also-indent-empty-lines nil)
+  )
 
 (use-package company
   :config
@@ -125,6 +131,7 @@
         )
   )
 
+
 (use-package posframe) ;; required by lsp-bridge
 
 ;;;;;;; <LSP BRIDGE>
@@ -143,7 +150,7 @@
   (setq lsp-headerline-breadcrumb-enable-diagnostics nil)
   (setq lsp-apply-edits-after-file-operations nil)
   (setq lsp-clients-clangd-args
-    '("--header-insertion=never"))
+        '("--header-insertion=never"))
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
 ;         (python-mode . lsp)
          (web-mode . lsp)
@@ -152,10 +159,15 @@
          (c++-mode . lsp)
          ;(lisp-mode . lsp)
          ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
+         (lsp-mode . lsp-enable-which-key-integration)
+
+
+         )
   :commands lsp)
 
 (require 'lsp-mode)
+(setq typescript-indent-level 2)
+(add-to-list 'lsp--formatting-indent-alist '(web-mode . typescript-indent-level))
 
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
