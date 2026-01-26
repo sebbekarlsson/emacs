@@ -78,3 +78,4 @@ tags
 /.cache/
 eln-cache
 dummy.c
+*.lsp-session-v*

@@ -170,7 +170,17 @@
 (add-to-list 'lsp--formatting-indent-alist '(web-mode . typescript-indent-level))
 
 ;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-ui
+  :commands lsp-ui-mode
+  :config
+  (defun lsp-ui-sideline--compute-height nil '(height unspecified))
+  (setq lsp-ui-doc-max-width 80)
+  (setq lsp-ui-doc-max-height 20)
+  (setq lsp-ui-doc-position 'at-point)
+  (setq lsp-ui-doc-alignment 'window)
+  (setq lsp-ui-sideline-show-diagnostics t)
+  (setq lsp-ui-sideline-diagnostic-max-lines 3)
+)
 ;; if you are helm user
 (use-package helm-lsp :commands helm-lsp-workspace-symbol)
 ;; if you are ivy user
