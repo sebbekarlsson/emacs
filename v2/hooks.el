@@ -41,10 +41,8 @@
 
 
 (defun my-c-setup ()
-  (c-add-style "Google" google-c-style t)
-
   (c-add-style "better-c-style"
-             '("Google" (c-basic-offset . 2) ; Guessed value
+             '("linux" (c-basic-offset . 2) ; Guessed value
                (c-offsets-alist (brace-list-close . 0) ; Guessed value
                                 (brace-list-entry . 0) ; Guessed value
                                 (brace-list-intro . +) ; Guessed value

@@ -9,7 +9,6 @@
 (setq tab-width 2)
 
 (require 'core)
-(require 'langstyles)
 (require 'packages)
 (require 'hooks)
 (require 'keybinds)

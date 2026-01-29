@@ -146,9 +146,11 @@
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
+  (setq lsp-enable-on-type-formatting nil)
   (setq lsp-headerline-breadcrumb-enable nil)
   (setq lsp-headerline-breadcrumb-enable-diagnostics nil)
   (setq lsp-apply-edits-after-file-operations nil)
+  (setq lsp-disabled-clients '(deno-ls))
   (setq lsp-clients-clangd-args
         '("--header-insertion=never"))
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
