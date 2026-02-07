@@ -41,8 +41,10 @@
 
 
 (defun my-c-setup ()
+  (setq indent-tabs-mode nil)
   (c-add-style "better-c-style"
              '("linux" (c-basic-offset . 2) ; Guessed value
+               (indent-tabs-mode . nil)
                (c-offsets-alist (brace-list-close . 0) ; Guessed value
                                 (brace-list-entry . 0) ; Guessed value
                                 (brace-list-intro . +) ; Guessed value
@@ -62,7 +64,7 @@
                                 (brace-entry-open . 0)
                                 (brace-list-open . 0)
                                 (c . c-lineup-C-comments)
-                                (case-label . 0) (catch-clause . 0)
+                                (case-label . +) (catch-clause . 0)
                                 (class-close . 0) (class-open . 0)
                                 (comment-intro . c-lineup-comment)
                                 (composition-close . 0)
@@ -107,7 +109,7 @@
                                 (statement-block-intro . +)
                                 ;(statement-block-intro . 0)
                                 ;(statement-block-intro . muckintosh)
-                                (statement-case-intro . +)
+                                (statement-case-intro . 0)
                                 (statement-case-open . 0)
                                 ;(statement-cont . +)
                                 (statement-cont . 0)
