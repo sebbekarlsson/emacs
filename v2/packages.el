@@ -42,8 +42,8 @@
 
 (use-package company
   :config
-  (setq company-idle-delay 0.005
-        company-minimum-prefix-length 1)
+  (setq company-idle-delay 0.15
+        company-minimum-prefix-length 2)
   (global-company-mode 1))
 
 (use-package flycheck
@@ -153,6 +153,15 @@
   (setq lsp-disabled-clients '(deno-ls pylsp))
   (setq lsp-clients-clangd-args
         '("--header-insertion=never"))
+  ;; Performance tuning
+  (setq read-process-output-max (* 1024 1024)) ; 1MB (default 4KB)
+  (setq lsp-idle-delay 0.5)                    ; debounce LSP requests (default 0.2)
+  (setq lsp-log-io nil)                         ; disable IO logging
+  (setq lsp-completion-provider :capf)          ; use capf (faster than company-lsp)
+  (setq lsp-enable-file-watchers nil)           ; disable file watchers (big perf win)
+  (setq lsp-enable-folding nil)                 ; disable features you may not need
+  (setq lsp-enable-symbol-highlighting nil)
+  (setq lsp-lens-enable nil)
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
 ;         (python-mode . lsp)
          (web-mode . lsp)
@@ -175,13 +184,13 @@
 (use-package lsp-ui
   :commands lsp-ui-mode
   :config
-  (defun lsp-ui-sideline--compute-height nil '(height unspecified))
   (setq lsp-ui-doc-max-width 80)
   (setq lsp-ui-doc-max-height 20)
   (setq lsp-ui-doc-position 'at-point)
   (setq lsp-ui-doc-alignment 'window)
   (setq lsp-ui-sideline-show-diagnostics t)
-  (setq lsp-ui-sideline-diagnostic-max-lines 3)
+  (setq lsp-ui-sideline-diagnostic-max-lines 1)
+  (setq lsp-ui-sideline-diagnostic-max-line-length 150)
 )
 ;; if you are helm user
 (use-package helm-lsp :commands helm-lsp-workspace-symbol)
@@ -216,7 +225,7 @@
    )
   :hook (python-mode . (lambda ()
                           (require 'lsp-pyright)
-                          (lsp))))  ; or lsp-deferred
+                          (lsp-deferred))))
 
 
 
