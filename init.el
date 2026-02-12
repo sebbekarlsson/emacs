@@ -22,6 +22,14 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(helm-minibuffer-history-key "M-p")
+ '(lsp-apply-edits-after-file-operations nil)
+ '(lsp-enable-on-type-formatting nil)
+ '(lsp-headerline-breadcrumb-enable nil)
+ '(lsp-pyright-auto-import-completions 1)
+ '(lsp-pyright-auto-search-paths 1)
+ '(lsp-pyright-langserver-command "basedpyright")
+ '(lsp-ui-doc-alignment 'window)
+ '(lsp-ui-doc-position 'at-point)
  '(package-selected-packages
    '(cmake-mode company doom-modeline doom-themes evil-collection
                 evil-multiedit exec-path-from-shell flycheck glsl-mode
