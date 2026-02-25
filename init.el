@@ -30,7 +30,14 @@
  '(lsp-pyright-langserver-command "basedpyright")
  '(lsp-ui-doc-alignment 'window)
  '(lsp-ui-doc-position 'at-point)
- '(package-selected-packages nil))
+ '(package-selected-packages
+   '(cmake-mode company doom-modeline doom-themes evil-collection
+                evil-multiedit exec-path-from-shell flycheck glsl-mode
+                helm-lsp lsp-ivy lsp-pyright lsp-treemacs lsp-ui
+                restart-emacs treemacs-evil undo-tree vertico vterm
+                web-mode yasnippet))
+ '(package-vc-selected-packages
+   '((claude-code :url "https://github.com/stevemolitor/claude-code.el"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
