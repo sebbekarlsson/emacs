@@ -13,6 +13,15 @@
 (require 'hooks)
 (require 'keybinds)
 
+;; Keep lock files, backups, and auto-saves out of project directories
+(let ((temp-dir (expand-file-name "tmp/" user-emacs-directory)))
+  (unless (file-exists-p temp-dir) (make-directory temp-dir t))
+  (setq backup-directory-alist `(("." . ,temp-dir)))
+  (setq auto-save-file-name-transforms `((".*" ,temp-dir t)))
+  (setq lock-file-directory temp-dir))
+
+(setq create-lockfiles nil) ; disable .#lockfiles entirely (they cause issues with bundlers/cmake)
+
 (setq gc-cons-threshold (* 50 1000 1000)) ; 50MB GC threshold
 (run-with-idle-timer 5 t #'garbage-collect)
 
@@ -33,9 +42,9 @@
  '(package-selected-packages
    '(cmake-mode company doom-modeline doom-themes evil-collection
                 evil-multiedit exec-path-from-shell flycheck glsl-mode
-                helm-lsp lsp-ivy lsp-pyright lsp-treemacs lsp-ui
-                restart-emacs treemacs-evil undo-tree vertico vterm
-                web-mode yasnippet))
+                helm-lsp kotlin-mode lsp-ivy lsp-pyright lsp-treemacs
+                lsp-ui restart-emacs swift-mode treemacs-evil
+                undo-tree vertico vterm web-mode yasnippet))
  '(package-vc-selected-packages
    '((claude-code :url "https://github.com/stevemolitor/claude-code.el"))))
 (custom-set-faces

@@ -28,6 +28,11 @@
 ;;;;;;;; </LSP BRIDGE>
 
 
+(add-hook 'css-mode-hook
+          (lambda ()
+            (setq css-indent-offset 2)))
+
+
 (add-hook 'json-mode-hook
           (lambda ()
             (make-local-variable 'js-indent-level)
