@@ -42,9 +42,10 @@
  '(package-selected-packages
    '(cmake-mode company doom-modeline doom-themes evil-collection
                 evil-multiedit exec-path-from-shell flycheck glsl-mode
-                helm-lsp kotlin-mode lsp-ivy lsp-pyright lsp-treemacs
-                lsp-ui restart-emacs swift-mode treemacs-evil
-                undo-tree vertico vterm web-mode yasnippet))
+                helm-lsp just-mode kotlin-mode lsp-ivy lsp-pyright
+                lsp-treemacs lsp-ui restart-emacs swift-mode
+                treemacs-evil undo-tree vertico vterm web-mode
+                yaml-mode yasnippet))
  '(package-vc-selected-packages
    '((claude-code :url "https://github.com/stevemolitor/claude-code.el"))))
 (custom-set-faces
