@@ -27,6 +27,11 @@
   :ensure t
   :after evil
   :diminish
+  :custom
+  ;; Keep .~undo-tree~ history files out of project trees so AI agents
+  ;; (and grep/ripgrep) don't trip over them.
+  (undo-tree-history-directory-alist
+   `(("." . ,(expand-file-name "undo-tree-history/" user-emacs-directory))))
   :config
   (evil-set-undo-system 'undo-tree)
   (global-undo-tree-mode 1))

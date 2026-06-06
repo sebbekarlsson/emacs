@@ -76,6 +76,7 @@ tags
 # End of https://www.toptal.com/developers/gitignore/api/vim,emacs
 /transient
 /.cache/
+/undo-tree-history/
 eln-cache
 dummy.c
 *.lsp-session-v*

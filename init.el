@@ -13,12 +13,11 @@
 (require 'hooks)
 (require 'keybinds)
 
-;; Keep lock files, backups, and auto-saves out of project directories
+;; Keep backups and auto-saves out of project directories
 (let ((temp-dir (expand-file-name "tmp/" user-emacs-directory)))
   (unless (file-exists-p temp-dir) (make-directory temp-dir t))
-  (setq backup-directory-alist `(("." . ,temp-dir)))
-  (setq auto-save-file-name-transforms `((".*" ,temp-dir t)))
-  (setq lock-file-directory temp-dir))
+  (setq backup-directory-alist `(("." . ,temp-dir)))       ; filename~
+  (setq auto-save-file-name-transforms `((".*" ,temp-dir t)))) ; #filename#
 
 (setq create-lockfiles nil) ; disable .#lockfiles entirely (they cause issues with bundlers/cmake)
 
