@@ -106,7 +106,19 @@
   :ensure t)
 
 (use-package glsl-mode
-  :ensure t)
+  :ensure t
+  :hook (glsl-mode . (lambda ()
+                       ;; glsl-mode is built on CC Mode and installs
+                       ;; `c-after-change', but unlike c-mode it leaves
+                       ;; `parse-sexp-lookup-properties' nil.  CC Mode's CPP
+                       ;; neutralizer (`c-neutralize-CPP-line') marks a stray
+                       ;; unbalanced paren with a punctuation syntax-table
+                       ;; property and re-scans, expecting it to be ignored.
+                       ;; With the variable nil that property is ignored, the
+                       ;; paren keeps counting, and the loop spins forever --
+                       ;; e.g. the instant you type the "(" in "#define FOO(".
+                       ;; Turning it on (as c-mode does) lets the loop end.
+                       (setq-local parse-sexp-lookup-properties t))))
 
 (use-package web-mode
   :ensure t
