@@ -1,3 +1,4 @@
+;;; hooks.el --- Mode hooks -*- lexical-binding: t; -*-
 
 ;;;;;;; <LSP BRIDGE>
 ;(setq lsp-bridge-enable-hover-diagnostic 1)

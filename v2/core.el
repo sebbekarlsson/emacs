@@ -1,3 +1,4 @@
+;;; core.el --- Core bootstrap -*- lexical-binding: t; -*-
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("gnu" . "https://elpa.gnu.org/packages/")))

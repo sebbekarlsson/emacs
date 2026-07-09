@@ -1,3 +1,4 @@
+;;; init.el --- Init -*- lexical-binding: t; -*-
 (add-to-list 'load-path (expand-file-name "v2" user-emacs-directory))
 
 (electric-pair-mode t)
@@ -21,6 +22,11 @@
 
 (setq create-lockfiles nil) ; disable .#lockfiles entirely (they cause issues with bundlers/cmake)
 
+;; ts-ls: never use the partialSemantic "syntax server" — it checks files with
+;; default compiler options (no tsconfig), causing bogus diagnostics that tsc
+;; doesn't report (e.g. shapes types collapsing to `never` without strict mode)
+(setq lsp-clients-typescript-tsserver '(:useSyntaxServer "never"))
+
 (setq gc-cons-threshold (* 50 1000 1000)) ; 50MB GC threshold
 (run-with-idle-timer 5 t #'garbage-collect)
 
@@ -38,13 +44,7 @@
  '(lsp-pyright-langserver-command "basedpyright")
  '(lsp-ui-doc-alignment 'window)
  '(lsp-ui-doc-position 'at-point)
- '(package-selected-packages
-   '(cmake-mode company doom-modeline doom-themes evil-collection
-                evil-multiedit exec-path-from-shell flycheck glsl-mode
-                helm-lsp just-mode kotlin-mode lsp-ivy lsp-pyright
-                lsp-treemacs lsp-ui restart-emacs swift-mode
-                treemacs-evil undo-tree vertico vterm web-mode
-                yaml-mode yasnippet))
+ '(package-selected-packages nil)
  '(package-vc-selected-packages
    '((claude-code :url "https://github.com/stevemolitor/claude-code.el"))))
 (custom-set-faces

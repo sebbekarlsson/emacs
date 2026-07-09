@@ -25,7 +25,7 @@ Packages auto-install from MELPA on first load. LSP servers auto-install to `.ca
 ## Key Design Decisions
 
 - **Completion stack:** Vertico (minibuffer) + Company (in-buffer, aggressive: 0.005s delay, 1-char prefix)
-- **LSP:** lsp-mode with lsp-ui. Active servers: clangd (C/C++), basedpyright (Python), typescript-language-server (JS/TS). Disabled clients: deno-ls, pylsp
+- **LSP:** lsp-mode with lsp-ui. Active servers: clangd (C/C++), basedpyright (Python), tsgo — TypeScript 7's native Go language server (JS/TS). Disabled clients: deno-ls, pylsp, ts-ls
 - **C/C++ style:** Custom "better-c-style" based on Linux style with 2-space indentation, no tabs, extensive offset customization in `hooks.el`
 - **Web-mode:** Handles .ts, .js, .jsx, .tsx, .mts, .mjs files with 2-space indent
 - **Evil integrations:** evil-collection, evil-multiedit (M-d workflow), undo-tree

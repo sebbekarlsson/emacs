@@ -1,3 +1,4 @@
+;;; packages.el --- Package declarations -*- lexical-binding: t; -*-
 (use-package markdown-mode)
 
 (use-package exec-path-from-shell
@@ -125,7 +126,7 @@
   :mode (("\\.ts\\'" . web-mode)
          ("\\.js\\'" . web-mode)
          ("\\.mjs\\'" . web-mode)
-         ("\\.mts\\'" . typescript-mode)
+         ("\\.mts\\'" . web-mode)
          ("\\.tsx\\'" . web-mode)
          ("\\.jsx\\'" . web-mode))
   ;:hook (web-mode . lsp)
@@ -167,7 +168,9 @@
   (setq lsp-headerline-breadcrumb-enable nil)
   (setq lsp-headerline-breadcrumb-enable-diagnostics nil)
   (setq lsp-apply-edits-after-file-operations nil)
-  (setq lsp-disabled-clients '(deno-ls pylsp tsgo))
+  ;; ts-ls is the old Node tsserver wrapper; tsgo is the native Go
+  ;; language server from TypeScript 7 (@typescript/native-preview).
+  (setq lsp-disabled-clients '(deno-ls pylsp ts-ls))
   (setq lsp-clients-clangd-args
         '("--header-insertion=never"))
   ;; Performance tuning
@@ -196,6 +199,13 @@
 (require 'lsp-mode)
 (setq typescript-indent-level 2)
 (add-to-list 'lsp--formatting-indent-alist '(web-mode . typescript-indent-level))
+
+;; Upstream lsp-mode doesn't recognize .mts/.cts: they're missing from both
+;; `lsp-language-id-configuration' and the ts/js activation predicate.
+(add-to-list 'lsp-language-id-configuration '("\\.[cm]ts\\'" . "typescript"))
+(advice-add 'lsp-typescript-javascript-tsx-jsx-activate-p :after-until
+            (lambda (filename &optional _)
+              (string-match-p "\\.[cm]ts\\'" filename)))
 
 ;; optionally
 (use-package lsp-ui

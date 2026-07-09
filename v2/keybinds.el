@@ -1,3 +1,4 @@
+;;; keybinds.el --- Keybindings -*- lexical-binding: t; -*-
 ;;
 ;; Multiedit
 ;;
