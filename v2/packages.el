@@ -200,6 +200,17 @@
 (setq typescript-indent-level 2)
 (add-to-list 'lsp--formatting-indent-alist '(web-mode . typescript-indent-level))
 
+;; lsp-mode advertises `(inlineCompletion . ())' in its client capabilities,
+;; which json-encodes to null. tsgo's strict Go JSON parser rejects null for
+;; that field and the initialize request fails. Give it an object body.
+(advice-add 'lsp--client-capabilities :filter-return
+            (lambda (caps)
+              (when-let* ((entry (assq 'inlineCompletion
+                                       (alist-get 'textDocument caps))))
+                (unless (cdr entry)
+                  (setcdr entry '((dynamicRegistration . :json-false)))))
+              caps))
+
 ;; Upstream lsp-mode doesn't recognize .mts/.cts: they're missing from both
 ;; `lsp-language-id-configuration' and the ts/js activation predicate.
 (add-to-list 'lsp-language-id-configuration '("\\.[cm]ts\\'" . "typescript"))
