@@ -44,7 +44,12 @@
  '(lsp-pyright-langserver-command "basedpyright")
  '(lsp-ui-doc-alignment 'window)
  '(lsp-ui-doc-position 'at-point)
- '(package-selected-packages nil)
+ '(package-selected-packages
+   '(cmake-mode company doom-modeline doom-themes evil-collection
+                evil-multiedit exec-path-from-shell flycheck glsl-mode
+                helm-lsp lsp-ivy lsp-pyright lsp-treemacs lsp-ui
+                nushell-mode restart-emacs rust-mode treemacs-evil
+                undo-tree vertico web-mode yasnippet))
  '(package-vc-selected-packages
    '((claude-code :url "https://github.com/stevemolitor/claude-code.el"))))
 (custom-set-faces
