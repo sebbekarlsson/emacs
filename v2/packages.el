@@ -52,6 +52,14 @@
         company-minimum-prefix-length 2)
   (global-company-mode 1))
 
+;; Company's child-frame popup hides itself on any window-configuration change
+;; where the selected window isn't the one it was drawn for. Emacs runs that
+;; hook with the *changed* frame selected, so whenever lsp-ui-doc shows its doc
+;; child frame, the completion box vanished. Ignore changes in child frames.
+(with-eval-after-load 'company-childframe
+  (advice-add 'company-childframe-window-change :before-until
+              (lambda () (frame-parent))))
+
 (use-package flycheck
   :ensure t
   :config
