@@ -43,7 +43,7 @@
  '(lsp-pyright-auto-search-paths 1)
  '(lsp-pyright-langserver-command "basedpyright")
  '(lsp-ui-doc-alignment 'window)
- '(lsp-ui-doc-position 'at-point)
+ '(lsp-ui-doc-position 'bottom)
  '(package-selected-packages
    '(cmake-mode company doom-modeline doom-themes evil-collection
                 evil-multiedit exec-path-from-shell flycheck glsl-mode

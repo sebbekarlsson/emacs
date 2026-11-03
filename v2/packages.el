@@ -222,9 +222,14 @@
 (use-package lsp-ui
   :commands lsp-ui-mode
   :config
+  ;; Don't show docs on mouse hover: it sets `track-mouse', so mouse-movement
+  ;; events get mixed into typed input and the popup can land under the pointer
+  ;; and take keyboard focus. Show docs for the symbol under the cursor instead.
+  (setq lsp-ui-doc-show-with-mouse nil)
+  (setq lsp-ui-doc-show-with-cursor t)
   (setq lsp-ui-doc-max-width 80)
   (setq lsp-ui-doc-max-height 20)
-  (setq lsp-ui-doc-position 'at-point)
+  (setq lsp-ui-doc-position 'bottom)
   (setq lsp-ui-doc-alignment 'window)
   (setq lsp-ui-sideline-show-diagnostics t)
   (setq lsp-ui-sideline-diagnostic-max-lines 1)
