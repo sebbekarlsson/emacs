@@ -131,4 +131,36 @@
 (add-hook 'kill-emacs-hook #'my/restart-session-save)
 (add-hook 'emacs-startup-hook #'my/restart-session-restore)
 
+;; Mouse: disabled entirely. Clicks, drags and wheel scrolls are dropped before
+;; any keymap sees them (buttons, links and popups included), and hovering
+;; neither highlights text nor shows tooltips.
+(defun my/drop-mouse-event (_prompt)
+  "Translate a mouse event to nothing."
+  [])
+
+(dolist (mod '("" "C-" "M-" "S-" "s-" "C-M-" "C-S-" "M-S-" "C-M-S-"))
+  (dotimes (i 9)
+    (dolist (kind '("" "down-" "up-" "drag-" "double-" "triple-"))
+      (define-key key-translation-map
+                  (vector (intern (format "%s%smouse-%d" mod kind (1+ i))))
+                  #'my/drop-mouse-event)))
+  (dolist (wheel '("wheel-up" "wheel-down" "wheel-left" "wheel-right"))
+    (dolist (kind '("" "double-" "triple-"))
+      (define-key key-translation-map (vector (intern (concat mod kind wheel)))
+                  #'my/drop-mouse-event))))
+
+(setq mouse-highlight nil)
+(tooltip-mode -1)
+
+;; On X11, while Emacs has keyboard focus, keystrokes go to whichever of its
+;; windows is under the pointer, and child-frame popups (company's completion
+;; box, lsp-ui-doc) count. So a pointer resting on a popup made typing land in
+;; the popup's buffer. Send keystrokes that arrive at a child frame to its parent.
+(defun my/child-frame-keyboard-to-parent (frame)
+  "Redirect keyboard input that arrives at child FRAME to its parent frame."
+  (when-let* ((parent (frame-parent frame)))
+    (redirect-frame-focus frame parent))
+  frame)
+(advice-add 'make-frame :filter-return #'my/child-frame-keyboard-to-parent)
+
 (provide 'keybinds)
