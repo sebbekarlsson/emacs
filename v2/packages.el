@@ -178,7 +178,7 @@
   (setq lsp-apply-edits-after-file-operations nil)
   ;; ts-ls is the old Node tsserver wrapper; tsgo is the native Go
   ;; language server from TypeScript 7 (@typescript/native-preview).
-  (setq lsp-disabled-clients '(deno-ls pylsp ts-ls))
+  (setq lsp-disabled-clients '(deno-ls ts-ls))
   (setq lsp-clients-clangd-args
         '("--header-insertion=never"))
   ;; Performance tuning
@@ -193,6 +193,7 @@
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
 ;         (python-mode . lsp)
          (web-mode . lsp)
+         (python-mode . lsp)
          (c-or-c++-mode . lsp)
          (c-mode . lsp)
          (c++-mode . lsp)
@@ -260,23 +261,23 @@
 
 
 
-;(add-to-list 'lsp-language-id-configuration '(python-mode . "python"))
-;(lsp-register-client (make-lsp-client
-;                      :new-connection (lsp-stdio-connection '("basedpyright-langserver" "--stdio"))
-;                      :activation-fn (lsp-activate-on "python")
-;                      :server-id 'basedpyright-langserver))
+(add-to-list 'lsp-language-id-configuration '(python-mode . "python"))
+(lsp-register-client (make-lsp-client
+                      :new-connection (lsp-stdio-connection '("basedpyright-langserver" "--stdio"))
+                      :activation-fn (lsp-activate-on "python")
+                      :server-id 'basedpyright-langserver))
 
-(use-package lsp-pyright
-  :ensure t
-  :custom (lsp-pyright-langserver-command "basedpyright") ;; or basedpyright
-  :config
-  (setq lsp-pyright-auto-import-completions 1
-        lsp-pyright-auto-search-paths 1
-        lsp-pyright-diagnostic-mode "openFilesOnly"
-   )
-  :hook (python-mode . (lambda ()
-                          (require 'lsp-pyright)
-                          (lsp-deferred))))
-
+;(use-package lsp-pyright
+;  :ensure t
+;  :custom (lsp-pyright-langserver-command "basedpyright") ;; or basedpyright
+;  :config
+;  (setq lsp-pyright-auto-import-completions 1
+;        lsp-pyright-auto-search-paths 1
+;        lsp-pyright-diagnostic-mode "openFilesOnly"
+;   )
+;  :hook (python-mode . (lambda ()
+;                          (require 'lsp-pyright)
+;                          (lsp-deferred))))
+;
 
 (provide 'packages)
