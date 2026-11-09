@@ -17,6 +17,7 @@ v2/
   hooks.el               # Mode hooks and language-specific settings (C style, Python, JS/TS)
   keybinds.el            # Custom keybindings and small utility functions
   configs/c.el           # Additional C config
+  configs/clangd.yaml    # clangd settings; hooks.el copies them into ~/.config/clangd/config.yaml
   langstyles/clang/      # Language style files
 ```
 

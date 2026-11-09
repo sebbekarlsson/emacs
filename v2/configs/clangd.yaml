@@ -1,0 +1,7 @@
+# clangd settings for every project. Emacs copies this into clangd's user
+# config (~/.config/clangd/config.yaml) when a C/C++ buffer opens; see
+# `my-clangd-sync-user-config' in v2/hooks.el. Needs clangd >= 20.
+Style:
+  # Insert #include <...> on completion, never #include "..." (clangd
+  # otherwise quotes headers it finds through -I directories).
+  AngledHeaders: [".*"]

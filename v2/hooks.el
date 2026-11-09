@@ -140,6 +140,60 @@
 
 (add-hook 'c-mode-hook 'my-c-setup)
 (add-hook 'c-mode-common-hook 'my-c-setup)
+
+
+;; clangd has no command-line flag for most of its settings (e.g. inserting
+;; #include <...> instead of "..."); they only come from config files. Keep
+;; them in this repo and copy them into clangd's user config, which applies
+;; to every project. They go in as a marked block in a separate YAML document
+;; (clangd allows several, split by "---"), so anything else in that file is
+;; left alone and only our own block is ever replaced.
+(defconst my-clangd-config-source
+  (expand-file-name "v2/configs/clangd.yaml" user-emacs-directory))
+
+(defconst my-clangd-block-begin
+  "# >>> managed by ~/.emacs.d/v2/configs/clangd.yaml, edit it there >>>")
+(defconst my-clangd-block-end "# <<< managed by ~/.emacs.d <<<")
+
+(defun my-clangd-user-config-file ()
+  "Path of clangd's user config file on this system."
+  (pcase system-type
+    ('darwin (expand-file-name "~/Library/Preferences/clangd/config.yaml"))
+    ('windows-nt (expand-file-name "clangd/config.yaml" (getenv "LOCALAPPDATA")))
+    (_ (expand-file-name "clangd/config.yaml"
+                         (or (getenv "XDG_CONFIG_HOME") "~/.config")))))
+
+(defun my-clangd-sync-user-config ()
+  "Write `my-clangd-config-source' into clangd's user config, if it changed."
+  (with-demoted-errors "Syncing clangd config: %S"
+    (let* ((target (my-clangd-user-config-file))
+           (block (concat "---\n" my-clangd-block-begin "\n"
+                          (with-temp-buffer
+                            (insert-file-contents my-clangd-config-source)
+                            (string-trim-right (buffer-string)))
+                          "\n" my-clangd-block-end "\n")))
+      (with-temp-buffer
+        (when (file-exists-p target)
+          (insert-file-contents target))
+        (let ((old (buffer-string)))
+          (goto-char (point-min))
+          (when (re-search-forward
+                 (concat "^\\(?:---\n\\)?" (regexp-quote my-clangd-block-begin)
+                         "\n\\(?:.*\n\\)*?" (regexp-quote my-clangd-block-end)
+                         "\n?")
+                 nil t)
+            (replace-match "" t t))
+          (goto-char (point-max))
+          (unless (or (bobp) (eq (char-before) ?\n))
+            (insert "\n"))
+          (insert block)
+          (unless (string= old (buffer-string))
+            (make-directory (file-name-directory target) t)
+            (write-region nil nil target nil 'silent)))))))
+
+;; c-mode-common-hook runs before c-mode-hook / c++-mode-hook, where lsp
+;; starts clangd, so the config is in place before clangd reads it.
+(add-hook 'c-mode-common-hook #'my-clangd-sync-user-config)
 ;(setq c-default-style "better-c-style")
 
 

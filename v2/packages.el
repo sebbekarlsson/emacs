@@ -179,8 +179,15 @@
   ;; ts-ls is the old Node tsserver wrapper; tsgo is the native Go
   ;; language server from TypeScript 7 (@typescript/native-preview).
   (setq lsp-disabled-clients '(deno-ls ts-ls))
+  ;; lsp-mode's default auto-download is clangd 15.0.6, which doesn't index
+  ;; the C standard library: `printf' isn't even offered until <stdio.h> is
+  ;; included. Newer clangd completes it and adds the #include for you.
+  ;; Must be set before lsp-clangd.el loads (it derives the binary path).
+  (setq lsp-clangd-version "23.1.0")
+  ;; iwyu: accepting a completion inserts the #include that declares it.
+  ;; Items that will add one are marked with a leading "•".
   (setq lsp-clients-clangd-args
-        '("--header-insertion=never"))
+        '("--header-insertion=iwyu"))
   ;; Performance tuning
   (setq read-process-output-max (* 1024 1024)) ; 1MB (default 4KB)
   (setq lsp-idle-delay 0.15)                    ; debounce LSP requests (default 0.2)
