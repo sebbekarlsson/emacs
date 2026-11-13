@@ -82,3 +82,7 @@ dummy.c
 *.lsp-session-v*
 .lsp-session-v1
 .lsp-session-v1
+# Compiled tree-sitter grammars (rebuilt per machine)
+/tree-sitter/
+# url.el cache and cookies (eww, package downloads)
+/url/
