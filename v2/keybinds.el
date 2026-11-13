@@ -52,6 +52,26 @@
 ;; Ex command that allows you to invoke evil-multiedit with a regular expression, e.g.
 (evil-ex-define-cmd "ie[dit]" 'evil-multiedit-ex-match)
 
+;; Markdown preview (see markdown-mode in packages.el).
+(defun my/markdown-live-preview ()
+  "Toggle the GitHub-style eww preview beside the current Markdown buffer."
+  (interactive)
+  (unless (derived-mode-p 'markdown-mode)
+    (user-error "Not a Markdown buffer"))
+  (call-interactively #'markdown-live-preview-mode))
+
+(defun my/markdown-browser-preview ()
+  "Open the current Markdown buffer in the web browser, styled like GitHub."
+  (interactive)
+  (unless (derived-mode-p 'markdown-mode)
+    (user-error "Not a Markdown buffer"))
+  (markdown-preview))
+
+;; :mdl[ive] toggles the side-by-side preview (refreshes on save),
+;; :mdp[review] opens the browser preview.
+(evil-ex-define-cmd "mdl[ive]" #'my/markdown-live-preview)
+(evil-ex-define-cmd "mdp[review]" #'my/markdown-browser-preview)
+
 ;; Key-bindings
 (evil-define-key 'treemacs treemacs-mode-map (kbd "r") #'treemacs-rename-file)
 (evil-define-key 'treemacs treemacs-mode-map (kbd "yy") #'treemacs-copy-file)

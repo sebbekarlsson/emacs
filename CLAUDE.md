@@ -19,6 +19,7 @@ v2/
   configs/c.el           # Additional C config
   configs/clangd.yaml    # clangd settings; hooks.el copies them into ~/.config/clangd/config.yaml
   langstyles/clang/      # Language style files
+  scripts/gfm.py         # GFM -> HTML renderer used as markdown-command (run via `uv run --script`)
 ```
 
 Packages auto-install from MELPA on first load. LSP servers auto-install to `.cache/lsp/npm/`. No build scripts or Makefile — Emacs handles everything on startup.

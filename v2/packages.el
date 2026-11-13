@@ -1,5 +1,46 @@
 ;;; packages.el --- Package declarations -*- lexical-binding: t; -*-
-(use-package markdown-mode)
+;; GitHub-style Markdown preview.
+;; - `:mdlive' (markdown-live-preview-mode): rendered side-by-side in eww,
+;;   refreshed on save.
+;; - `:mdpreview' (markdown-preview): opens in the browser with GitHub's CSS.
+;; Rendering is done by v2/scripts/gfm.py (markdown-it-py, run through uv,
+;; which fetches its dependencies on first use).
+(defun my/markdown-render (beg end output-buffer)
+  "Render Markdown between BEG and END as HTML into OUTPUT-BUFFER.
+Relative image paths are made absolute so previews written to /tmp
+still find them. The eww live preview shows <picture> dark variants
+when the theme is dark, since eww ignores <source>."
+  (let* ((args (append
+                (list "run" "--quiet" "--script"
+                      (expand-file-name "v2/scripts/gfm.py" user-emacs-directory)
+                      "--base" (expand-file-name default-directory))
+                (and (bound-and-true-p markdown-live-preview-currently-exporting)
+                     (eq (frame-parameter nil 'background-mode) 'dark)
+                     '("--dark"))))
+         (status (apply #'call-process-region beg end
+                        (or (executable-find "uv") "uv")
+                        nil (list output-buffer nil) nil args)))
+    (unless (eq status 0)
+      (error "gfm.py failed with exit code %s" status))))
+
+(use-package markdown-mode
+  :custom
+  (markdown-command #'my/markdown-render)
+  (markdown-fontify-code-blocks-natively t)
+  (markdown-css-paths
+   '("https://cdn.jsdelivr.net/npm/github-markdown-css@5.8.1/github-markdown.min.css"))
+  (markdown-xhtml-header-content
+   "<style>.markdown-body{box-sizing:border-box;max-width:980px;margin:0 auto;padding:45px}</style>")
+  (markdown-xhtml-body-preamble "<article class=\"markdown-body\">")
+  (markdown-xhtml-body-epilogue "</article>"))
+
+;; Syntax-highlight <pre> code blocks in eww/shr with Emacs' own major modes,
+;; so the live preview's code blocks match the editor theme.
+(use-package shr-tag-pre-highlight
+  :after shr
+  :config
+  (add-to-list 'shr-external-rendering-functions
+               '(pre . shr-tag-pre-highlight)))
 
 (use-package exec-path-from-shell
   :ensure t)
