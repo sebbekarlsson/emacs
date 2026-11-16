@@ -123,6 +123,29 @@ when the theme is dark, since eww ignores <source>."
 (use-package doom-themes
   :config (load-theme 'doom-one t))
 
+(use-package nerd-icons
+  :config
+  (defvar my/nerd-icons-font-checked nil
+    "Non-nil once the Nerd Font check has run on a graphical frame.")
+
+  (defun my/nerd-icons-ensure-font (&optional frame)
+    "Install `nerd-icons-font-family' if FRAME's display can't find it.
+Font lookup needs a graphical frame, so this does nothing on a tty
+and runs again when a daemon client opens its first GUI frame."
+    (when (and (not my/nerd-icons-font-checked)
+               (display-graphic-p frame)
+               (memq system-type '(gnu gnu/linux gnu/kfreebsd darwin)))
+      (setq my/nerd-icons-font-checked t)
+      (remove-hook 'server-after-make-frame-hook #'my/nerd-icons-ensure-font)
+      (unless (member nerd-icons-font-family (font-family-list frame))
+        (nerd-icons-install-fonts t)
+        (message "Installed %s; restart Emacs for the icons to show up"
+                 nerd-icons-font-family))))
+
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook #'my/nerd-icons-ensure-font)
+    (my/nerd-icons-ensure-font)))
+
 (use-package doom-modeline
   :hook (after-init . doom-modeline-mode))
 
