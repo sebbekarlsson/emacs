@@ -246,7 +246,22 @@ and runs again when a daemon client opens its first GUI frame."
                       (point-max))))
         (list beg end))))
   (advice-add 'web-mode-invalidate-part-region
-              :filter-args #'my/web-mode-widen-js-invalidation))
+              :filter-args #'my/web-mode-widen-js-invalidation)
+  ;; web-mode sets `yank-excluded-properties' to t, so `insert-for-yank'
+  ;; strips *every* property from pasted text -- but it does so after the
+  ;; insertion, i.e. after web-mode has already scanned and highlighted it.
+  ;; The pasted block ends up with no faces and no tag properties (so no
+  ;; indentation either). web-mode only repairs this for the `yank' command;
+  ;; evil's insert-state paste (C-r), mouse and clipboard pastes all miss it.
+  ;; Re-scan and re-highlight the pasted region whatever command pasted it.
+  (defun my/web-mode-rescan-after-yank (start end)
+    (when (derived-mode-p 'web-mode)
+      (save-excursion
+        (if font-lock-mode
+            (font-lock-fontify-region start end)
+          (web-mode-scan start end)))))
+  (advice-add 'remove-yank-excluded-properties
+              :after #'my/web-mode-rescan-after-yank))
 
 
 (use-package posframe) ;; required by lsp-bridge
