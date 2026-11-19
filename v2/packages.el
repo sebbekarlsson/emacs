@@ -219,7 +219,34 @@ and runs again when a daemon client opens its first GUI frame."
         web-mode-enable-comment-keywords t
         web-mode-enable-current-element-highlight t
         )
-  )
+  ;; After an edit, web-mode only re-scans a small window around the change in
+  ;; JS/TS/JSX buffers: from the previous line ending in [;{}(] to the next
+  ;; one ending in [;{})]. Inside a JSX tree that window often starts mid
+  ;; element (e.g. right after "{cond && (" or "}}"), the scanner can't tell
+  ;; the tags apart from JS there, and drops their tag properties. Those lines
+  ;; then lose highlighting and indentation until the whole buffer is
+  ;; re-scanned (e.g. by re-running `web-mode'). Widen the window to the
+  ;; enclosing top-level statement (a line starting in column 0 with an
+  ;; identifier/keyword, e.g. "export const Foo = ..."), so the scan always
+  ;; starts in plain JS context and covers the whole component.
+  (defun my/web-mode-widen-js-invalidation (args)
+    (if (not (member web-mode-content-type '("jsx" "javascript" "typescript")))
+        args
+      (let ((beg (nth 0 args))
+            (end (nth 1 args))
+            (top-level "^[[:alpha:]_$@]"))
+        (save-excursion
+          (goto-char beg)
+          (end-of-line)
+          (setq beg (if (re-search-backward top-level nil t) (point) (point-min)))
+          (goto-char end)
+          (end-of-line)
+          (setq end (if (re-search-forward top-level nil t)
+                        (max (match-beginning 0) end)
+                      (point-max))))
+        (list beg end))))
+  (advice-add 'web-mode-invalidate-part-region
+              :filter-args #'my/web-mode-widen-js-invalidation))
 
 
 (use-package posframe) ;; required by lsp-bridge
