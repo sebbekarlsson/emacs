@@ -380,21 +380,25 @@ and runs again when a daemon client opens its first GUI frame."
                       :activation-fn (lsp-activate-on "python")
                       :server-id 'basedpyright-langserver))
 
-;; `lsp-enable-file-watchers' is off globally for performance, but pyright
-;; depends on workspace/didChangeWatchedFiles to invalidate its import cache.
-;; Without it, a newly created module (or a new def in one) stays unresolved
-;; until `lsp-restart-workspace'. Turn watchers on for basedpyright only: both
+;; `lsp-enable-file-watchers' is off globally for performance, but some
+;; servers depend on workspace/didChangeWatchedFiles to learn about files
+;; created or changed on disk. Without it, pyright and tsgo keep stale import
+;; caches: a newly created module (or a new export in one) stays unresolved
+;; until `lsp-restart-workspace'. Turn watchers on for these servers only: both
 ;; the initialize capabilities and the server's dynamic registration run with
 ;; `lsp--cur-workspace' bound, so key the exception off its server id.
-(defun my/lsp-file-watchers-for-pyright (orig &rest args)
+(defvar my/lsp-file-watcher-servers '(basedpyright-langserver tsgo)
+  "Server ids that get file watchers despite `lsp-enable-file-watchers' being nil.")
+
+(defun my/lsp-file-watchers-for-servers (orig &rest args)
   (let ((lsp-enable-file-watchers
          (or lsp-enable-file-watchers
              (and lsp--cur-workspace
-                  (eq (lsp--workspace-server-id lsp--cur-workspace)
-                      'basedpyright-langserver)))))
+                  (memq (lsp--workspace-server-id lsp--cur-workspace)
+                        my/lsp-file-watcher-servers)))))
     (apply orig args)))
-(advice-add 'lsp--client-capabilities :around #'my/lsp-file-watchers-for-pyright)
-(advice-add 'lsp--server-register-capability :around #'my/lsp-file-watchers-for-pyright)
+(advice-add 'lsp--client-capabilities :around #'my/lsp-file-watchers-for-servers)
+(advice-add 'lsp--server-register-capability :around #'my/lsp-file-watchers-for-servers)
 
 ;(use-package lsp-pyright
 ;  :ensure t
