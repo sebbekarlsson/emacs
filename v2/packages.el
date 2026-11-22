@@ -380,6 +380,22 @@ and runs again when a daemon client opens its first GUI frame."
                       :activation-fn (lsp-activate-on "python")
                       :server-id 'basedpyright-langserver))
 
+;; `lsp-enable-file-watchers' is off globally for performance, but pyright
+;; depends on workspace/didChangeWatchedFiles to invalidate its import cache.
+;; Without it, a newly created module (or a new def in one) stays unresolved
+;; until `lsp-restart-workspace'. Turn watchers on for basedpyright only: both
+;; the initialize capabilities and the server's dynamic registration run with
+;; `lsp--cur-workspace' bound, so key the exception off its server id.
+(defun my/lsp-file-watchers-for-pyright (orig &rest args)
+  (let ((lsp-enable-file-watchers
+         (or lsp-enable-file-watchers
+             (and lsp--cur-workspace
+                  (eq (lsp--workspace-server-id lsp--cur-workspace)
+                      'basedpyright-langserver)))))
+    (apply orig args)))
+(advice-add 'lsp--client-capabilities :around #'my/lsp-file-watchers-for-pyright)
+(advice-add 'lsp--server-register-capability :around #'my/lsp-file-watchers-for-pyright)
+
 ;(use-package lsp-pyright
 ;  :ensure t
 ;  :custom (lsp-pyright-langserver-command "basedpyright") ;; or basedpyright
