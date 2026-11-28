@@ -185,6 +185,34 @@ and runs again when a daemon client opens its first GUI frame."
 (use-package cmake-mode
   :ensure t)
 
+;; Slang shaders. The tree-sitter grammar is per machine; Emacs offers to build
+;; it the first time a .slang file is opened. LSP setup is in hooks.el.
+(use-package slang-ts-mode
+  :vc (:url "https://github.com/HikariNee/slang-ts-mode" :rev :newest)
+  :mode "\\.slang\\'"
+  :custom
+  (slang-ts-indent-offset 2)
+  :config
+  ;; The grammar the mode pins is ABI 15, which tree-sitter libraries before
+  ;; 0.25 can't load (Debian 13 has 0.22). Use the last ABI 14 grammar there,
+  ;; without the keywords it doesn't know: one unknown keyword breaks the
+  ;; highlighting of all of them.
+  (when (< (treesit-library-abi-version) 15)
+    (setf (alist-get 'slang treesit-language-source-alist)
+          '("https://github.com/tree-sitter-grammars/tree-sitter-slang"
+            :commit "46c689005a4cf18e4e752c7215c8fc9a0c8b0130"))
+    (setq slang-ts-mode--font-lock-settings
+          (mapcan (lambda (setting)
+                    (if (eq (nth 2 setting) 'keyword)
+                        (treesit-font-lock-rules
+                         :language 'slang
+                         :feature 'keyword
+                         `([,@(seq-difference slang-ts-mode--keywords
+                                              '("dyn" "some" "implementing"))]
+                           @font-lock-keyword-face))
+                      (list setting)))
+                  slang-ts-mode--font-lock-settings))))
+
 (use-package glsl-mode
   :ensure t
   :hook (glsl-mode . (lambda ()

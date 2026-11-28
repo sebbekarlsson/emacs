@@ -197,6 +197,193 @@
 ;(setq c-default-style "better-c-style")
 
 
+;; Slang (slangd). Projects bring their own slangd (e.g. through a Vulkan SDK
+;; fetched into the build directory), so look inside the project first.
+(defconst my-slangd-max-levels-up 12
+  "How many directories to go up when looking for the project's .git.")
+
+(defconst my-slangd-max-depth 8
+  "How many directories below the project root to look for slangd.")
+
+(defconst my-slangd-ignored-directories
+  '(".git" ".hg" ".svn" "node_modules" ".venv" "venv" "__pycache__" ".cache")
+  "Directories that are never searched for slangd.")
+
+(defvar my-slangd-cache (make-hash-table :test #'equal)
+  "Maps a project root to the slangd found inside it, or to `none'.
+Filled the first time a Slang file is opened in a project, so that each
+project is only searched once.")
+
+(defun my-slangd-forget ()
+  "Search for slangd again the next time a Slang file is opened."
+  (interactive)
+  (clrhash my-slangd-cache))
+
+(defun my-slangd-project-root (dir)
+  "Go up from DIR, at most `my-slangd-max-levels-up' levels, to find .git.
+It can also be a file, as in worktrees and submodules."
+  (let ((dir (file-name-as-directory (expand-file-name dir)))
+        (levels my-slangd-max-levels-up)
+        root)
+    (while (and dir (not root) (>= levels 0))
+      (if (file-exists-p (expand-file-name ".git" dir))
+          (setq root dir)
+        (let ((parent (file-name-directory (directory-file-name dir))))
+          (setq dir (unless (equal parent dir) parent)
+                levels (1- levels)))))
+    root))
+
+(defun my-slangd-search-down (root)
+  "Find a slangd binary below ROOT, preferring the one closest to it.
+Doesn't follow symlinked directories, which could loop."
+  (let ((name (if (eq system-type 'windows-nt) "slangd.exe" "slangd"))
+        (dirs (list root))
+        (depth 0)
+        found)
+    (while (and dirs (not found) (<= depth my-slangd-max-depth))
+      (let (next)
+        (while (and dirs (not found))
+          (let* ((dir (pop dirs))
+                 (entries (ignore-errors (file-name-all-completions "" dir)))
+                 (file (expand-file-name name dir)))
+            (if (and (member name entries) (file-executable-p file))
+                (setq found file)
+              (dolist (entry (sort entries
+                                   (lambda (a b)
+                                     (string< (directory-file-name a)
+                                              (directory-file-name b)))))
+                (when (and (directory-name-p entry)
+                           (not (member entry '("./" "../"))))
+                  (let* ((base (directory-file-name entry))
+                         (sub (expand-file-name base dir)))
+                    (unless (or (member base my-slangd-ignored-directories)
+                                (file-symlink-p sub))
+                      (push (file-name-as-directory sub) next))))))))
+        (setq dirs (nreverse next)
+              depth (1+ depth))))
+    found))
+
+(defun my-slangd-find ()
+  "Return the slangd to use for the current buffer, or nil.
+Looks inside the buffer's git project first, then in PATH."
+  (let ((root (my-slangd-project-root default-directory)))
+    (or (when root
+          (let ((cached (gethash root my-slangd-cache)))
+            (cond
+             ((eq cached 'none) nil)
+             ((and cached (file-executable-p cached)) cached)
+             (t (let ((found (my-slangd-search-down root)))
+                  (puthash root (or found 'none) my-slangd-cache)
+                  found)))))
+        (executable-find "slangd"))))
+
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-language-id-configuration '(slang-ts-mode . "slang"))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection
+                     (lambda () (list (or (my-slangd-find) "slangd"))))
+    :activation-fn (lsp-activate-on "slang")
+    :request-handlers (lsp-ht ("workspace/inlayHint/refresh" #'ignore))
+    :server-id 'slangd)))
+
+(defun my-slang-setup ()
+  ;; At the default level 3, functions and numbers aren't highlighted.
+  (setq-local treesit-font-lock-level 4)
+  (treesit-font-lock-recompute-features)
+  (if (my-slangd-find)
+      (lsp)
+    ;; Not `error': that would abort the rest of the mode setup.
+    (display-warning
+     'slangd
+     (format "No slangd found for %s: not in its git project, not in PATH"
+             (or buffer-file-name (buffer-name)))
+     :error)))
+
+(add-hook 'slang-ts-mode-hook #'my-slang-setup)
+
+;; slangd has no "find references" (it doesn't index the project), so search
+;; the project's Slang files for the name instead. Goes back to asking the
+;; server by itself if a future slangd supports it.
+(defun my-slang-text-references-p ()
+  "Non-nil if references must be found by text search in this buffer."
+  (and (derived-mode-p 'slang-ts-mode)
+       (not (lsp-feature? "textDocument/references"))))
+
+(defun my-slang-project-files ()
+  "Return the project's Slang files, without the ones git ignores."
+  (let ((case-fold-search nil)
+        (project (project-current)))
+    (seq-filter (lambda (file) (string-match-p "\\.slangh?\\'" file))
+                (if project
+                    (project-files project)
+                  (directory-files default-directory t)))))
+
+(defun my-slang-matches-in-buffer (name file)
+  "Return xrefs to FILE for the whole-word matches of NAME in this buffer."
+  (let ((case-fold-search nil)
+        (regexp (format "\\_<%s\\_>" (regexp-quote name)))
+        matches)
+    (save-excursion
+      (save-restriction
+        (widen)
+        ;; The standard table has "_" as part of symbols.
+        (with-syntax-table (standard-syntax-table)
+          (goto-char (point-min))
+          (while (re-search-forward regexp nil t)
+            (let* ((start (match-beginning 0))
+                   (bol (line-beginning-position))
+                   (column (- start bol))
+                   (line (buffer-substring-no-properties
+                          bol (line-end-position))))
+              (put-text-property column (+ column (length name))
+                                 'face 'xref-match line)
+              (push (xref-make-match
+                     line
+                     (xref-make-file-location
+                      file (line-number-at-pos start t) column)
+                     (length name))
+                    matches))))))
+    (nreverse matches)))
+
+(defun my-slang-text-references (name)
+  "Return xrefs for every whole-word match of NAME in the project.
+Includes unsaved changes in open buffers."
+  (require 'xref)
+  (require 'project)
+  (mapcan (lambda (file)
+            (let ((buffer (find-buffer-visiting file)))
+              (cond
+               (buffer
+                (with-current-buffer buffer
+                  (my-slang-matches-in-buffer name file)))
+               ((file-readable-p file)
+                (with-temp-buffer
+                  (insert-file-contents file)
+                  (my-slang-matches-in-buffer name file))))))
+          (my-slang-project-files)))
+
+(defun my-slang-find-references (orig &rest args)
+  "Around advice for `lsp-find-references': search text if slangd can't."
+  (if (not (my-slang-text-references-p))
+      (apply orig args)
+    (let* ((name (or (thing-at-point 'symbol t)
+                     (user-error "No symbol at point")))
+           (xrefs (my-slang-text-references name)))
+      (unless xrefs
+        (user-error "No references found for %s" name))
+      (lsp-show-xrefs xrefs (plist-get (cdr args) :display-action) t))))
+
+(with-eval-after-load 'lsp-mode
+  (advice-add 'lsp-find-references :around #'my-slang-find-references)
+  ;; M-? (`xref-find-references') asks the server on its own.
+  (cl-defmethod xref-backend-references :around ((_backend (eql 'xref-lsp))
+                                                 identifier)
+    (if (my-slang-text-references-p)
+        (my-slang-text-references (substring-no-properties identifier))
+      (cl-call-next-method))))
+
+
 ;(defun un-indent-by-removing-4-spaces ()
 ;  "remove 4 spaces from beginning of of line"
 ;  (interactive)
