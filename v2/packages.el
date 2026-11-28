@@ -116,6 +116,13 @@ when the theme is dark, since eww ignores <source>."
   :init
   (vertico-mode))
 
+;; Descriptions next to minibuffer candidates (packages, commands, files, ...).
+(use-package marginalia
+  :ensure t
+  :bind (:map minibuffer-local-map
+         ("M-a" . marginalia-cycle))
+  :init
+  (marginalia-mode))
 
 (use-package iedit
   :ensure t)
